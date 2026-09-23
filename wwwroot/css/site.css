@@ -1,0 +1,138 @@
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+header .navbar {
+    background-color: rgba(0, 0, 0, 0.5) !important;
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+}
+
+.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
+  color: var(--bs-secondary-color);
+  text-align: end;
+}
+
+.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
+  text-align: start;
+}
+
+.portada {
+    text-align: center;
+    padding-top: 30px;
+}
+
+    .portada h1 {
+        color: white;
+        font-size: 100px;
+        font-weight: 400;
+        letter-spacing: 0px;
+        text-shadow: 3px 5px 1px rgba(0, 0, 0, 1);
+        margin-bottom: 100px;
+    }
+
+    .portada p {
+        color: white;
+        font-size: 24px;
+        letter-spacing: 0px;
+        text-shadow: 1px 1px 3px rgba(0, 0, 0, 1);
+    }
+
+.pagina1 {
+    background-image: url("/images/LibraryBackground.png");
+    background-size: cover;
+    background-position: center top;
+    background-repeat: no-repeat;
+}
+
+.pagina2 {
+    background-color: white;
+}
+
+.boton-tarjeta {
+    width: 300px;
+    height: 500px;
+    /* También podrías usar:
+        background-image: url("textura.jpg");
+        background-size: cover;
+        */
+
+    border-radius: 25px;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 40px;
+    font-weight: bold;
+    text-align: center;
+    cursor: pointer;
+    transition: 0.3s;
+    box-shadow: 0 8px 20px rgba(0,0,0,.25);
+}
+
+    .boton-tarjeta:hover {
+        transform: translateY(-5px);
+    }
+
+.pestana {
+    position: absolute;
+    top: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    height: 25px;
+    background: white;
+    border-radius: 12px;
+}
+
+.boton-tarjeta span {
+    padding: 20px;
+}
+
+.boton-catalogo {
+    background: linear-gradient(135deg, #8B5A2B, #4A2C1A);
+}
+
+.boton-gestion {
+    /* Naranja */
+    background: linear-gradient(135deg, #FF9800, #E65100);
+}
+
+.boton-carga {
+    /* Azul */
+    background: linear-gradient(135deg, #2D6CDF, #1F4BA5);
+}
+
+.boton-reportes {
+    /* Verde */
+    background: linear-gradient(135deg, #43A047, #1B5E20);
+}
+
+.contenedor-tarjetas {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    width: 100%;
+}
+
+footer {
+    background-color: rgba(0, 0, 0, 0.5) !important;
+}

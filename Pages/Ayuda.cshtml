@@ -1,0 +1,141 @@
+@page
+@model GestiónDeBiblioteca.Pages.AyudaModel
+
+<div class="container mt-4">
+
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold">
+            Ayuda
+        </h1>
+    </div>
+
+    <div class="row justify-content-center">
+
+        <div class="col-md-8">
+
+            @* ========== INFORMACIÓN DEL ESTUDIANTE ========== *@
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Información del Estudiante</h4>
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless">
+                        <tr>
+                            <td class="fw-bold" style="width: 200px;">Nombre:</td>
+                            <td>Kevin</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Carné:</td>
+                            <td>202602</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Curso:</td>
+                            <td>IPC2 - Programación II</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Proyecto:</td>
+                            <td>Gestión de Biblioteca - Sistema Inteligente de Catálogo</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Semestre:</td>
+                            <td>2026</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            @* ========== DESCRIPCIÓN DEL PROYECTO ========== *@
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-info text-white">
+                    <h4 class="mb-0">Descripción del Proyecto</h4>
+                </div>
+                <div class="card-body">
+                    <p>
+                        Sistema inteligente para administrar más de 100,000 libros distribuidos en varias sucursales.
+                        Permite registrar nuevos libros, buscar títulos rápidamente, conocer qué libros están
+                        relacionados con una categoría específica y mostrar la organización completa del catálogo.
+                    </p>
+                    <h5>Estructuras de Datos Utilizadas</h5>
+                    <ul>
+                        <li><strong>Árbol AVL por ISBN:</strong> Búsqueda e inserción O(log n) por código único.</li>
+                        <li><strong>Árbol AVL por Título:</strong> Búsqueda y listado alfabético O(log n).</li>
+                        <li><strong>Árbol N-ario de Categorías:</strong> Jerarquía ilimitada de categorías/subcategorías.</li>
+                        <li><strong>Listas Enlazadas:</strong> Para hijos de categorías y utilidades internas.</li>
+                    </ul>
+                </div>
+            </div>
+
+            @* ========== FUNCIONALIDADES ========== *@
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0">Funcionalidades</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Pantalla Principal</h5>
+                            <ul>
+                                <li>Navegación a todos los módulos</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Gestión de Libros</h5>
+                            <ul>
+                                <li>Registrar libros con ISBN, título, autor y categoría</li>
+                                <li>Buscar libro por ISBN</li>
+                                <li>Eliminar libros (selección múltiple)</li>
+                                <li>Ordenar por ISBN ascendente/descendente</li>
+                                <li>Mostrar menor y mayor ISBN</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Catálogo</h5>
+                            <ul>
+                                <li>Ver estructura jerárquica de categorías</li>
+                                <li>Agregar categorías raíz</li>
+                                <li>Agregar subcategorías</li>
+                                <li>Visualizar desde subcategoría específica</li>
+                                <li>Diagrama Graphviz de categorías</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Cargar XML</h5>
+                            <ul>
+                                <li>Subir archivos XML de entrada</li>
+                                <li>Carga incremental (no pierde datos)</li>
+                                <li>Soporte para categorías y libros</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Reportes</h5>
+                            <ul>
+                                <li>Árbol AVL por ISBN (Graphviz)</li>
+                                <li>Estructura de categorías (Graphviz)</li>
+                                <li>Libros por categoría (Graphviz)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @* ========== TECNOLOGÍAS ========== *@
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-secondary text-white">
+                    <h4 class="mb-0">Tecnologías</h4>
+                </div>
+                <div class="card-body">
+                    <ul>
+                        <li><strong>Backend:</strong> ASP.NET Core 10.0 (Razor Pages)</li>
+                        <li><strong>Lenguaje:</strong> C#</li>
+                        <li><strong>Frontend:</strong> Bootstrap 5 + jQuery</li>
+                        <li><strong>Reportes:</strong> Graphviz (dot → SVG)</li>
+                        <li><strong>Datos:</strong> Estructuras de datos propias (TDA), sin base de datos</li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

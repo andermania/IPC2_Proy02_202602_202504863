@@ -1,0 +1,157 @@
+@page
+@model GestiónDeBiblioteca.Pages.CargarLibrosModel
+
+<div class="container mt-4">
+
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold">
+            Cargar Libros desde XML
+        </h1>
+        <p class="lead text-muted">
+            Suba un archivo XML para cargar categorías y libros al catálogo.
+        </p>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model.MensajeExito))
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @Model.MensajeExito
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (!string.IsNullOrEmpty(Model.MensajeError))
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @Model.MensajeError
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="row justify-content-center">
+
+        <div class="col-md-8">
+
+            @* ========== FORMULARIO DE CARGA ========== *@
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-info text-white">
+                    <h4 class="mb-0">Subir Archivo XML</h4>
+                </div>
+                <div class="card-body">
+                    <form method="post"
+                          asp-page-handler="Cargar"
+                          enctype="multipart/form-data">
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">
+                                Seleccionar archivo XML
+                            </label>
+                            <input type="file"
+                                   name="archivoXml"
+                                   accept=".xml"
+                                   class="form-control"
+                                   required />
+                            <div class="form-text">
+                                Formato esperado: listaCategorias + listaLibros (ver documentación)
+                            </div>
+                        </div>
+
+                        <button type="submit"
+                                class="btn btn-info text-white w-100">
+                            Cargar Archivo
+                        </button>
+
+                    </form>
+                </div>
+            </div>
+
+            @* ========== RESULTADO DE CARGA ========== *@
+            @if (Model.Resultado != null)
+            {
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-secondary text-white">
+                        <h4 class="mb-0">Resultado de la Carga</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center">
+
+                            <div class="col-md-4 mb-3">
+                                <div class="card bg-success text-white">
+                                    <div class="card-body">
+                                        <h2>@Model.Resultado.LibrosCargados</h2>
+                                        <p class="mb-0">Libros Cargados</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <div class="card bg-warning text-dark">
+                                    <div class="card-body">
+                                        <h2>@Model.Resultado.LibrosDuplicados</h2>
+                                        <p class="mb-0">Duplicados Ignorados</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <div class="card bg-info text-white">
+                                    <div class="card-body">
+                                        <h2>@Model.Resultado.CategoriasCreadas</h2>
+                                        <p class="mb-0">Categorías Creadas</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        @if (Model.Resultado.Errores.ObtenerCantidad() > 0)
+                        {
+                            <hr />
+                            <h5>Errores encontrados:</h5>
+                            <ul class="list-group">
+                                @foreach (var error in Model.Resultado.Errores.ObtenerArray())
+                                {
+                                    <li class="list-group-item list-group-item-danger">
+                                        @error
+                                    </li>
+                                }
+                            </ul>
+                        }
+                    </div>
+                </div>
+            }
+
+            @* ========== EJEMPLO XML ========== *@
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h4 class="mb-0">Formato Esperado del XML</h4>
+                </div>
+                <div class="card-body">
+                    <pre class="bg-light p-3 rounded" style="overflow-x: auto; font-size: 13px;"><code>&lt;?xml version="1.0"?&gt;
+&lt;config&gt;
+  &lt;listaCategorias&gt;
+    &lt;categoria&gt;Ficción&lt;/categoria&gt;
+    &lt;categoria padre="Ficción"&gt;Ciencia Ficción&lt;/categoria&gt;
+    &lt;categoria padre="Ficción"&gt;Fantasía&lt;/categoria&gt;
+  &lt;/listaCategorias&gt;
+  &lt;listaLibros&gt;
+    &lt;libro&gt;
+      &lt;ISBN&gt;1234&lt;/ISBN&gt;
+      &lt;titulo&gt;El Señor de los Anillos&lt;/titulo&gt;
+      &lt;autor&gt;J.R.R. Tolkien&lt;/autor&gt;
+      &lt;categoria&gt;Fantasía&lt;/categoria&gt;
+    &lt;/libro&gt;
+  &lt;/listaLibros&gt;
+&lt;/config&gt;</code></pre>
+                    <div class="alert alert-info mt-3">
+                        <strong>Nota:</strong> El archivo es incremental. Puede cargar múltiples archivos XML
+                        sin perder los datos existentes. Los elementos listaCategorias y listaLibros son opcionales.
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

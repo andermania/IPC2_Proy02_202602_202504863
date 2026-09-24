@@ -1,0 +1,9 @@
+﻿digraph AVL_ISBN {
+  rankdir=TB;
+  node [shape=circle, style=filled, fontname="Arial"];
+  edge [arrowsize=0.7];
+  label="Árbol AVL - ISBN";
+  fontsize=18;
+  labelloc=t;
+  "n123" [label="123\nHarry Pother", fillcolor="#A5D6A7"];
+}

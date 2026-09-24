@@ -1,30 +1,41 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - GestiónDeBiblioteca</title>
-    <script type="importmap"></script>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/GestiónDeBiblioteca.styles.css" asp-append-version="true" />
 </head>
 <body class="@ViewData["BodyClass"]">
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-sm navbar-dark navbar-toggleable-sm border-bottom box-shadow mb-3" style="background-color: rgba(0, 0, 0, 0.7);">
             <div class="container">
-                <a class="navbar-brand text-white"" asp-area="" asp-page="/Index">GestiónDeBiblioteca</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+                <a class="navbar-brand text-white" asp-area="" asp-page="/Index">📚 Biblioteca</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse"
+                        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-white" asp-area="" asp-page="/Index">Home</a>
+                            <a class="nav-link text-white" asp-area="" asp-page="/Index">Inicio</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-white" asp-area="" asp-page="/Privacy">Privacy</a>
+                            <a class="nav-link text-white" asp-area="" asp-page="/Catalogo">Catálogo</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white" asp-area="" asp-page="/Gestion">Gestión</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white" asp-area="" asp-page="/CargarLibros">Cargar XML</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white" asp-area="" asp-page="/Reportes">Reportes</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white" asp-area="" asp-page="/Ayuda">Ayuda</a>
                         </li>
                     </ul>
                 </div>
@@ -37,14 +48,15 @@
         </main>
     </div>
 
-    <footer class="border-top footer text-white">
+    <footer class="border-top footer text-white" style="background-color: rgba(0, 0, 0, 0.5);">
         <div class="container">
-            &copy; 2026 - GestiónDeBiblioteca - <a asp-area="" asp-page="/Privacy">Privacy</a>
+            &copy; 2026 - GestiónDeBiblioteca - <a asp-area="" asp-page="/Ayuda">Ayuda</a>
         </div>
     </footer>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/viz.js@2.1.2/viz.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
 
     @await RenderSectionAsync("Scripts", required: false)

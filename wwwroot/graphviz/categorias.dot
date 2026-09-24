@@ -1,0 +1,13 @@
+﻿digraph Categorias {
+  rankdir=TB;
+  node [shape=box, style=filled, fillcolor="#E3F2FD", fontname="Arial"];
+  edge [color="#666666"];
+  label="Estructura de Categorías";
+  fontsize=20;
+  labelloc=t;
+  "Biblioteca" [fillcolor="#1565C0", fontcolor=white];
+  "Biblioteca" -> "Ciencia";
+  "Ciencia" [label="Ciencia\n(0 libros)", fillcolor="#BBDEFB"];
+  "Ciencia" -> "Filosofía";
+  "Filosofía" [label="Filosofía\n(0 libros)", fillcolor="#C8E6C9"];
+}

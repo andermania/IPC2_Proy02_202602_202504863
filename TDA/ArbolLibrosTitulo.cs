@@ -1,38 +1,38 @@
-﻿using GestiónDeBiblioteca.Model;
+using GestiónDeBiblioteca.Model;
 
 namespace GestiónDeBiblioteca.TDA
 {
     /// <summary>
-    /// Nodo del árbol AVL indexado por ISBN.
-    /// Cada nodo almacena un libro y mantiene la altura para balanceo.
+    /// Nodo del árbol AVL indexado por Título.
+    /// Permite búsqueda y listado alfabético de libros.
     /// </summary>
-    public class NodoISBN
+    public class NodoTitulo
     {
         public Libro Libro { get; set; }
-        public NodoISBN? Izquierda { get; set; }
-        public NodoISBN? Derecha { get; set; }
+        public NodoTitulo? Izquierda { get; set; }
+        public NodoTitulo? Derecha { get; set; }
         public int Altura { get; set; }
 
-        public NodoISBN(Libro libro)
+        public NodoTitulo(Libro libro)
         {
             Libro = libro;
             Izquierda = null;
             Derecha = null;
-            Altura = 1; // Nuevo nodo siempre tiene altura 1
+            Altura = 1;
         }
     }
 
     /// <summary>
-    /// Árbol AVL (Adelson-Velsky y Landis) para libros indexados por ISBN.
-    /// Garantiza O(log n) en inserción, búsqueda y eliminación mediante rotaciones.
-    /// No utiliza estructuras de C# (List, Dictionary, etc.).
+    /// Árbol AVL para libros indexados por Título (orden alfabético).
+    /// La comparación se realiza ignorando mayúsculas/minúsculas para búsquedas más naturales.
+    /// Garantiza O(log n) en operaciones principales.
     /// </summary>
-    public class ArbolLibrosISBN
+    public class ArbolLibrosTitulo
     {
-        private NodoISBN? raiz;
+        private NodoTitulo? raiz;
         private int contador;
 
-        public ArbolLibrosISBN()
+        public ArbolLibrosTitulo()
         {
             raiz = null;
             contador = 0;
@@ -40,29 +40,17 @@ namespace GestiónDeBiblioteca.TDA
 
         // ===================== UTILIDADES DE ALTURA =====================
 
-        /// <summary>
-        /// Retorna la altura de un nodo (0 si es null).
-        /// </summary>
-        private int ObtenerAltura(NodoISBN? nodo)
+        private int ObtenerAltura(NodoTitulo? nodo)
         {
             return nodo == null ? 0 : nodo.Altura;
         }
 
-        /// <summary>
-        /// Calcula el factor de equilibrio de un nodo.
-        /// positivo = subárbol izquierdo más pesado
-        /// negativo = subárbol derecho más pesado
-        /// 0 = equilibrado
-        /// </summary>
-        private int ObtenerEquilibrio(NodoISBN? nodo)
+        private int ObtenerEquilibrio(NodoTitulo? nodo)
         {
             return nodo == null ? 0 : ObtenerAltura(nodo.Izquierda) - ObtenerAltura(nodo.Derecha);
         }
 
-        /// <summary>
-        /// Recalcula la altura de un nodo basándose en sus hijos.
-        /// </summary>
-        private void ActualizarAltura(NodoISBN nodo)
+        private void ActualizarAltura(NodoTitulo nodo)
         {
             int altIzq = ObtenerAltura(nodo.Izquierda);
             int altDer = ObtenerAltura(nodo.Derecha);
@@ -71,18 +59,10 @@ namespace GestiónDeBiblioteca.TDA
 
         // ===================== ROTACIONES =====================
 
-        /// <summary>
-        /// Rotación simple a la derecha.
-        ///      y           x
-        ///     / \         / \
-        ///    x   C  →    A   y
-        ///   / \             / \
-        ///  A   B           B   C
-        /// </summary>
-        private NodoISBN RotarDerecha(NodoISBN y)
+        private NodoTitulo RotarDerecha(NodoTitulo y)
         {
-            NodoISBN x = y.Izquierda!;
-            NodoISBN B = x.Derecha!;
+            NodoTitulo x = y.Izquierda!;
+            NodoTitulo B = x.Derecha!;
 
             x.Derecha = y;
             y.Izquierda = B;
@@ -93,18 +73,10 @@ namespace GestiónDeBiblioteca.TDA
             return x;
         }
 
-        /// <summary>
-        /// Rotación simple a la izquierda.
-        ///    x               y
-        ///   / \             / \
-        ///  A   y     →     x   C
-        ///     / \         / \
-        ///    B   C       A   B
-        /// </summary>
-        private NodoISBN RotarIzquierda(NodoISBN x)
+        private NodoTitulo RotarIzquierda(NodoTitulo x)
         {
-            NodoISBN y = x.Derecha!;
-            NodoISBN B = y.Izquierda!;
+            NodoTitulo y = x.Derecha!;
+            NodoTitulo B = y.Izquierda!;
 
             y.Izquierda = x;
             x.Derecha = B;
@@ -115,11 +87,23 @@ namespace GestiónDeBiblioteca.TDA
             return y;
         }
 
+        // ===================== COMPARACIÓN =====================
+
+        /// <summary>
+        /// Compara dos títulos ignorando mayúsculas/minúsculas.
+        /// Retorna negativo si a < b, 0 si son iguales, positivo si a > b.
+        /// </summary>
+        private int CompararTitulos(string a, string b)
+        {
+            return string.Compare(a, b, StringComparison.OrdinalIgnoreCase);
+        }
+
         // ===================== INSERCIÓN =====================
 
         /// <summary>
-        /// Inserta un libro en el árbol AVL por ISBN.
-        /// Retorna false si el ISBN ya existe.
+        /// Inserta un libro en el árbol por título.
+        /// Si dos libros tienen el mismo título, se diferencia por ISBN.
+        /// Retorna false si ya existe un libro con el mismo título E ISBN.
         /// </summary>
         public bool Insertar(Libro libro)
         {
@@ -134,39 +118,44 @@ namespace GestiónDeBiblioteca.TDA
             return insertado;
         }
 
-        private NodoISBN InsertarRecursivo(NodoISBN? actual, Libro libro, ref bool insertado)
+        private NodoTitulo InsertarRecursivo(NodoTitulo? actual, Libro libro, ref bool insertado)
         {
             if (actual == null)
             {
                 insertado = true;
-                return new NodoISBN(libro);
+                return new NodoTitulo(libro);
             }
 
-            if (libro.ISBN < actual.Libro.ISBN)
+            int comparacion = CompararTitulos(libro.Titulo, actual.Libro.Titulo);
+
+            if (comparacion < 0)
             {
                 actual.Izquierda = InsertarRecursivo(actual.Izquierda, libro, ref insertado);
             }
-            else if (libro.ISBN > actual.Libro.ISBN)
+            else if (comparacion > 0)
             {
                 actual.Derecha = InsertarRecursivo(actual.Derecha, libro, ref insertado);
             }
-            // Si ISBN == actual.ISBN, no se inserta (duplicado)
             else
             {
-                return actual;
+                // Títulos iguales → comparar por ISBN para permitir libros diferentes
+                if (libro.ISBN < actual.Libro.ISBN)
+                {
+                    actual.Izquierda = InsertarRecursivo(actual.Izquierda, libro, ref insertado);
+                }
+                else if (libro.ISBN > actual.Libro.ISBN)
+                {
+                    actual.Derecha = InsertarRecursivo(actual.Derecha, libro, ref insertado);
+                }
+                // Mismo título y mismo ISBN = duplicado, no se inserta
             }
 
-            // Actualizar altura y aplicar rotaciones si es necesario
             ActualizarAltura(actual);
             return Balancear(actual);
         }
 
         // ===================== ELIMINACIÓN =====================
 
-        /// <summary>
-        /// Elimina un libro del árbol por ISBN.
-        /// Retorna false si no se encontró.
-        /// </summary>
         public bool Eliminar(int isbn)
         {
             bool eliminado = false;
@@ -180,27 +169,29 @@ namespace GestiónDeBiblioteca.TDA
             return eliminado;
         }
 
-        private NodoISBN? EliminarRecursivo(NodoISBN? actual, int isbn, ref bool eliminado)
+        private NodoTitulo? EliminarRecursivo(NodoTitulo? actual, int isbn, ref bool eliminado)
         {
             if (actual == null)
             {
                 return null;
             }
 
-            if (isbn < actual.Libro.ISBN)
+            int comparacion = isbn.CompareTo(actual.Libro.ISBN);
+
+            if (comparacion < 0)
             {
+                // Buscar en subárbol izquierdo (por ISBN para encontrar el nodo exacto)
                 actual.Izquierda = EliminarRecursivo(actual.Izquierda, isbn, ref eliminado);
             }
-            else if (isbn > actual.Libro.ISBN)
+            else if (comparacion > 0)
             {
                 actual.Derecha = EliminarRecursivo(actual.Derecha, isbn, ref eliminado);
             }
             else
             {
-                // Nodo encontrado
+                // Nodo encontrado por ISBN
                 eliminado = true;
 
-                // Caso 1: Nodo hoja o con un solo hijo
                 if (actual.Izquierda == null)
                 {
                     return actual.Derecha;
@@ -210,8 +201,8 @@ namespace GestiónDeBiblioteca.TDA
                     return actual.Izquierda;
                 }
 
-                // Caso 2: Dos hijos → reemplazar con sucesor inorden (mínimo del subárbol derecho)
-                NodoISBN sucesor = ObtenerMinimoNodo(actual.Derecha);
+                // Dos hijos → sucesor inorden
+                NodoTitulo sucesor = ObtenerMinimoNodo(actual.Derecha);
                 actual.Libro = sucesor.Libro;
                 actual.Derecha = EliminarRecursivo(actual.Derecha, sucesor.Libro.ISBN, ref eliminado);
             }
@@ -220,51 +211,41 @@ namespace GestiónDeBiblioteca.TDA
             return Balancear(actual);
         }
 
-        // ===================== BALANCEO GENÉRICO =====================
+        // ===================== BALANCEO =====================
 
-        /// <summary>
-        /// Verifica el equilibrio de un nodo y aplica las rotaciones necesarias.
-        /// Casos: II, DD, ID, DI
-        /// </summary>
-        private NodoISBN Balancear(NodoISBN nodo)
+        private NodoTitulo Balancear(NodoTitulo nodo)
         {
             int equilibrio = ObtenerEquilibrio(nodo);
 
-            // Subárbol izquierdo pesado (casos II e ID)
             if (equilibrio > 1)
             {
                 if (ObtenerEquilibrio(nodo.Izquierda) < 0)
                 {
-                    // Caso ID: rotación doble izquierda-derecha
                     nodo.Izquierda = RotarIzquierda(nodo.Izquierda!);
                 }
-                // Caso II: rotación simple derecha
                 return RotarDerecha(nodo);
             }
 
-            // Subárbol derecho pesado (casos DD e DI)
             if (equilibrio < -1)
             {
                 if (ObtenerEquilibrio(nodo.Derecha) > 0)
                 {
-                    // Caso DI: rotación doble derecha-izquierda
                     nodo.Derecha = RotarDerecha(nodo.Derecha!);
                 }
-                // Caso DD: rotación simple izquierda
                 return RotarIzquierda(nodo);
             }
 
-            return nodo; // Ya está equilibrado
+            return nodo;
         }
 
         // ===================== BÚSQUEDA =====================
 
         /// <summary>
-        /// Busca un libro por ISBN. O(log n).
+        /// Busca un libro por ISBN en este árbol.
         /// </summary>
-        public Libro? Buscar(int isbn)
+        public Libro? BuscarPorISBN(int isbn)
         {
-            NodoISBN? actual = raiz;
+            NodoTitulo? actual = raiz;
 
             while (actual != null)
             {
@@ -281,37 +262,36 @@ namespace GestiónDeBiblioteca.TDA
             return null;
         }
 
+        /// <summary>
+        /// Busca un libro por título exacto (ignorando mayúsculas).
+        /// Retorna el primer libro encontrado con ese título.
+        /// </summary>
+        public Libro? BuscarPorTitulo(string titulo)
+        {
+            NodoTitulo? actual = raiz;
+
+            while (actual != null)
+            {
+                int comparacion = CompararTitulos(titulo, actual.Libro.Titulo);
+
+                if (comparacion == 0)
+                {
+                    return actual.Libro;
+                }
+
+                actual = comparacion < 0
+                    ? actual.Izquierda
+                    : actual.Derecha;
+            }
+
+            return null;
+        }
+
         // ===================== MÍNIMO Y MÁXIMO =====================
 
-        /// <summary>
-        /// Obtiene el libro con el ISBN más bajo.
-        /// </summary>
-        public Libro? ObtenerMenorISBN()
+        private NodoTitulo ObtenerMinimoNodo(NodoTitulo nodo)
         {
-            return raiz == null ? null : ObtenerMinimoNodo(raiz).Libro;
-        }
-
-        /// <summary>
-        /// Obtiene el libro con el ISBN más alto.
-        /// </summary>
-        public Libro? ObtenerMayorISBN()
-        {
-            if (raiz == null)
-            {
-                return null;
-            }
-
-            NodoISBN actual = raiz;
-            while (actual.Derecha != null)
-            {
-                actual = actual.Derecha;
-            }
-            return actual.Libro;
-        }
-
-        private NodoISBN ObtenerMinimoNodo(NodoISBN nodo)
-        {
-            NodoISBN actual = nodo;
+            NodoTitulo actual = nodo;
             while (actual.Izquierda != null)
             {
                 actual = actual.Izquierda;
@@ -319,12 +299,32 @@ namespace GestiónDeBiblioteca.TDA
             return actual;
         }
 
+        public Libro? ObtenerPrimeroAlfabeticamente()
+        {
+            return raiz == null ? null : ObtenerMinimoNodo(raiz).Libro;
+        }
+
+        public Libro? ObtenerUltimoAlfabeticamente()
+        {
+            if (raiz == null)
+            {
+                return null;
+            }
+
+            NodoTitulo actual = raiz;
+            while (actual.Derecha != null)
+            {
+                actual = actual.Derecha;
+            }
+            return actual.Libro;
+        }
+
         // ===================== RECORRIDOS =====================
 
         /// <summary>
-        /// Recorrido inorden ascendente (menor a mayor ISBN).
+        /// Retorna todos los libros ordenados alfabéticamente por título.
         /// </summary>
-        public Libro[] ObtenerAscendente()
+        public Libro[] ObtenerOrdenAlfabetico()
         {
             Libro[] libros = new Libro[contador];
             int posicion = 0;
@@ -332,7 +332,7 @@ namespace GestiónDeBiblioteca.TDA
             return libros;
         }
 
-        private void InOrden(NodoISBN? actual, Libro[] libros, ref int posicion)
+        private void InOrden(NodoTitulo? actual, Libro[] libros, ref int posicion)
         {
             if (actual == null)
             {
@@ -345,30 +345,6 @@ namespace GestiónDeBiblioteca.TDA
             InOrden(actual.Derecha, libros, ref posicion);
         }
 
-        /// <summary>
-        /// Recorrido inorden descendente (mayor a menor ISBN).
-        /// </summary>
-        public Libro[] ObtenerDescendente()
-        {
-            Libro[] libros = new Libro[contador];
-            int posicion = 0;
-            InOrdenInverso(raiz, libros, ref posicion);
-            return libros;
-        }
-
-        private void InOrdenInverso(NodoISBN? actual, Libro[] libros, ref int posicion)
-        {
-            if (actual == null)
-            {
-                return;
-            }
-
-            InOrdenInverso(actual.Derecha, libros, ref posicion);
-            libros[posicion] = actual.Libro;
-            posicion++;
-            InOrdenInverso(actual.Izquierda, libros, ref posicion);
-        }
-
         // ===================== UTILIDADES =====================
 
         public int ObtenerCantidad()
@@ -376,14 +352,13 @@ namespace GestiónDeBiblioteca.TDA
             return contador;
         }
 
-        public NodoISBN? ObtenerRaiz()
+        public NodoTitulo? ObtenerRaiz()
         {
             return raiz;
         }
 
         /// <summary>
-        /// Genera una representación en texto del árbol (para depuración).
-        /// Muestra la estructura con indentación.
+        /// Genera representación en texto del árbol (para depuración).
         /// </summary>
         public string GenerarTextoArbol()
         {
@@ -395,16 +370,12 @@ namespace GestiónDeBiblioteca.TDA
             return GenerarTextoNodo(raiz, "", true);
         }
 
-        private string GenerarTextoNodo(NodoISBN nodo, string prefijo, bool esUltimo)
+        private string GenerarTextoNodo(NodoTitulo nodo, string prefijo, bool esUltimo)
         {
             string resultado = prefijo + (esUltimo ? "└── " : "├── ")
                 + $"[{nodo.Libro.ISBN}] {nodo.Libro.Titulo} (h={nodo.Altura})\n";
 
             string nuevoPrefijo = prefijo + (esUltimo ? "    " : "│   ");
-
-            int hijos = 0;
-            if (nodo.Izquierda != null) hijos++;
-            if (nodo.Derecha != null) hijos++;
 
             if (nodo.Izquierda != null)
             {

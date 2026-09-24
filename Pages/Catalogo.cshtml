@@ -1,0 +1,197 @@
+@page
+@model GestiónDeBiblioteca.Pages.CatalogoModel
+
+<div class="container mt-4">
+
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold">
+            Catálogo de Categorías
+        </h1>
+        <p class="lead text-muted">
+            Estructura jerárquica completa de categorías y subcategorías.
+        </p>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model.MensajeExito))
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @Model.MensajeExito
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (!string.IsNullOrEmpty(Model.MensajeError))
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @Model.MensajeError
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="row">
+
+        @* ========== AGREGAR CATEGORÍA ========== *@
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0">Agregar Categoría</h4>
+                </div>
+                <div class="card-body">
+                    <form method="post" asp-page-handler="AgregarCategoria">
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Nombre</label>
+                            <input asp-for="NuevaCategoria"
+                                   type="text"
+                                   class="form-control"
+                                   placeholder="Ej: Ciencia"
+                                   required />
+                        </div>
+
+                        <button type="submit"
+                                class="btn btn-success w-100">
+                            Agregar Categoría Raíz
+                        </button>
+                    </form>
+
+                    <hr />
+
+                    <form method="post" asp-page-handler="AgregarSubcategoria">
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Categoría Padre</label>
+                            <select asp-for="CategoriaPadre"
+                                    asp-items="Model.OpcionesCategorias"
+                                    class="form-select"
+                                    required>
+                                <option value="">-- Seleccione padre --</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Nombre Subcategoría</label>
+                            <input asp-for="NuevaSubcategoria"
+                                   type="text"
+                                   class="form-control"
+                                   placeholder="Ej: Física Cuántica"
+                                   required />
+                        </div>
+
+                        <button type="submit"
+                                class="btn btn-outline-success w-100">
+                            Agregar Subcategoría
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        @* ========== ESTRUCTURA JERÁRQUICA ========== *@
+        <div class="col-md-8 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">Estructura de Categorías</h4>
+                    <span class="badge bg-light text-primary">
+                        @Model.TotalCategorías categorías | @Model.TotalLibros libros
+                    </span>
+                </div>
+                <div class="card-body">
+                    @if (Model.EstructuraTexto.Length == 0)
+                    {
+                        <div class="text-center text-muted py-4">
+                            <h5>No hay categorías definidas</h5>
+                            <p>Agregue categorías usando el formulario de la izquierda o cargue un archivo XML.</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <pre class="bg-light p-3 rounded" style="overflow-x: auto; white-space: pre-wrap; font-family: 'Consolas', monospace; font-size: 14px;">@Model.EstructuraTexto</pre>
+                    }
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    @* ========== VISUALIZAR DESDE SUBCATEGORÍA ========== *@
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-info text-white">
+            <h4 class="mb-0">Visualizar Desde Subcategoría Específica</h4>
+        </div>
+        <div class="card-body">
+            <form method="post" asp-page-handler="VisualizarDesde" class="row g-3">
+                <div class="col-md-8">
+                    <select asp-for="RutaVisualizar"
+                            asp-items="Model.OpcionesTodasCategorias"
+                            class="form-select">
+                        <option value="">-- Raíz completa --</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <button type="submit"
+                            class="btn btn-info text-white w-100">
+                        Visualizar
+                    </button>
+                </div>
+            </form>
+
+            @if (!string.IsNullOrEmpty(Model.EstructuraParcial))
+            {
+                <hr />
+                <pre class="bg-light p-3 rounded" style="overflow-x: auto; white-space: pre-wrap; font-family: 'Consolas', monospace; font-size: 14px;">@Model.EstructuraParcial</pre>
+            }
+        </div>
+    </div>
+
+    @* ========== ÁRBOL DE CATEGORÍAS EN GRAPHVIZ ========== *@
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">Diagrama Visual de Categorías (Graphviz)</h4>
+            <button class="btn btn-sm btn-outline-light" onclick="cargarGraficoCategorias()">
+                Regenerar
+            </button>
+        </div>
+        <div class="card-body text-center">
+            <div id="graficoCategorias" style="min-height: 200px;">
+                <p class="text-muted">Cargando diagrama...</p>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+<script>
+    function cargarGraficoCategorias() {
+        fetch('/Catalogo?handler=DotCategorias')
+            .then(r => r.text())
+            .then(dot => {
+                try {
+                    var viz = new Viz();
+                    viz.renderSVGElement(dot)
+                        .then(svg => {
+                            var container = document.getElementById('graficoCategorias');
+                            container.innerHTML = '';
+                            svg.style.maxWidth = '100%';
+                            svg.style.height = 'auto';
+                            container.appendChild(svg);
+                        })
+                        .catch(err => {
+                            document.getElementById('graficoCategorias').innerHTML =
+                                '<div class="alert alert-danger">Error renderizando: ' + err.message + '</div>';
+                        });
+                } catch (e) {
+                    document.getElementById('graficoCategorias').innerHTML =
+                        '<div class="alert alert-warning">viz.js no disponible. Verifique la conexión a internet.</div>';
+                }
+            })
+            .catch(err => {
+                document.getElementById('graficoCategorias').innerHTML =
+                    '<div class="alert alert-danger">Error cargando DOT: ' + err + '</div>';
+            });
+    }
+
+    // Cargar al inicio
+    window.addEventListener('load', cargarGraficoCategorias);
+</script>
+}

@@ -9,83 +9,176 @@
         </h1>
     </div>
 
-    <div class="card shadow-sm mb-4">
+    @if (!string.IsNullOrEmpty(Model.MensajeExito))
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @Model.MensajeExito
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
 
-        <div class="card-header">
-            <h4 class="mb-0">Registrar Nuevo Libro</h4>
+    @if (!string.IsNullOrEmpty(Model.MensajeError))
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @Model.MensajeError
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="row">
+
+        @* ========== REGISTRAR NUEVO LIBRO ========== *@
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0">Registrar Nuevo Libro</h4>
+                </div>
+                <div class="card-body">
+                    <form method="post" asp-page-handler="Registrar">
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">ISBN</label>
+                            <input asp-for="ISBN"
+                                   type="number"
+                                   class="form-control"
+                                   placeholder="Ej: 1234"
+                                   required />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Título</label>
+                            <input asp-for="Titulo"
+                                   type="text"
+                                   class="form-control"
+                                   placeholder="Ej: Cien años de soledad"
+                                   required />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Autor</label>
+                            <input asp-for="Autor"
+                                   type="text"
+                                   class="form-control"
+                                   placeholder="Ej: Gabriel García Márquez"
+                                   required />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Categoría</label>
+                            <select asp-for="CategoriaSeleccionada"
+                                    asp-items="Model.OpcionesCategorias"
+                                    class="form-select"
+                                    id="selectCategoria"
+                                    required>
+                                <option value="">-- Seleccione una categoría --</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Subcategoría (opcional)</label>
+                            <select asp-for="SubcategoriaSeleccionada"
+                                    asp-items="Model.OpcionesSubcategorias"
+                                    class="form-select"
+                                    id="selectSubcategoria">
+                                <option value="">-- Sin subcategoría --</option>
+                            </select>
+                        </div>
+
+                        <button type="submit"
+                                class="btn btn-success w-100">
+                            Registrar Libro
+                        </button>
+
+                    </form>
+                </div>
+            </div>
         </div>
 
-        <div class="card-body">
-
-            <form method="post" asp-page-handler="Registrar">
-
-                <div class="row">
-
-                    <div class="col-md-3 mb-3">
-                        <label class="form-label">
-                            ISBN
-                        </label>
-
-                        <input asp-for="ISBN"
-                               type="number"
-                               class="form-control"
-                               required />
-                    </div>
-
-                    <div class="col-md-3 mb-3">
-                        <label class="form-label">
-                            Título
-                        </label>
-
-                        <input asp-for="Titulo"
-                               type="text"
-                               class="form-control"
-                               required />
-                    </div>
-
-                    <div class="col-md-3 mb-3">
-                        <label class="form-label">
-                            Autor
-                        </label>
-
-                        <input asp-for="Autor"
-                               type="text"
-                               class="form-control"
-                               required />
-                    </div>
-
-                    <div class="col-md-3 mb-3">
-                        <label class="form-label">
-                            Categoría
-                        </label>
-
-                        <select asp-for="Categoria"
-                                class="form-select"
-                                required>
-
-                            <option value="">
-                                Seleccione una categoría
-                            </option>
-
-                        </select>
-                    </div>
-
+        @* ========== BUSCAR LIBRO ========== *@
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Buscar Libro</h4>
                 </div>
+                <div class="card-body">
+                    <form method="post" asp-page-handler="Buscar">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">ISBN</label>
+                            <input asp-for="BusquedaISBN"
+                                   type="number"
+                                   class="form-control"
+                                   placeholder="Ingrese el ISBN a buscar"
+                                   required />
+                        </div>
+                        <button type="submit"
+                                class="btn btn-primary w-100">
+                            Buscar
+                        </button>
+                    </form>
 
-                <button type="submit"
-                        class="btn btn-success">
-                    Registrar Libro
-                </button>
+                    @if (Model.LibroEncontrado != null)
+                    {
+                        <hr />
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h5 class="card-title">@Model.LibroEncontrado.Titulo</h5>
+                                <p class="mb-1"><strong>ISBN:</strong> @Model.LibroEncontrado.ISBN</p>
+                                <p class="mb-1"><strong>Autor:</strong> @Model.LibroEncontrado.Autor</p>
+                                <p class="mb-0"><strong>Categoría:</strong> @Model.LibroEncontrado.Categoria</p>
+                            </div>
+                        </div>
+                    }
 
-            </form>
+                    @if (!string.IsNullOrEmpty(Model.MensajeBusqueda))
+                    {
+                        <div class="alert alert-info mt-3 mb-0">
+                            @Model.MensajeBusqueda
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
 
+    </div>
+
+    @* ========== MIN / MAX ISBN ========== *@
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card shadow-sm border-info">
+                <div class="card-body text-center">
+                    <h6 class="text-muted">Menor ISBN</h6>
+                    @if (Model.MenorISBN != null)
+                    {
+                        <h4 class="text-info">[@Model.MenorISBN.ISBN] @Model.MenorISBN.Titulo</h4>
+                    }
+                    else
+                    {
+                        <p class="text-muted">No hay libros</p>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow-sm border-warning">
+                <div class="card-body text-center">
+                    <h6 class="text-muted">Mayor ISBN</h6>
+                    @if (Model.MayorISBN != null)
+                    {
+                        <h4 class="text-warning">[@Model.MayorISBN.ISBN] @Model.MayorISBN.Titulo</h4>
+                    }
+                    else
+                    {
+                        <p class="text-muted">No hay libros</p>
+                    }
+                </div>
+            </div>
         </div>
     </div>
 
+    @* ========== TABLA DE LIBROS ========== *@
     <div class="d-flex justify-content-between align-items-center mb-3">
-
         <h3 class="mb-0">
-            Libros Registrados
+            Libros Registrados (@Model.Libros.Length)
         </h3>
 
         <form method="post"
@@ -101,57 +194,40 @@
                     id="btnEliminar"
                     class="btn btn-danger"
                     disabled>
-                Eliminar
+                Eliminar Seleccionados
             </button>
 
         </form>
-
     </div>
 
     <div class="table-responsive">
 
         <table class="table table-bordered table-hover">
 
-            <thead>
+            <thead class="table-dark">
 
                 <tr>
-
-                    <th style="width: 50px;">
-                        Seleccionar
+                    <th style="width: 50px;" class="text-center">
+                        <input type="checkbox" id="checkAll" />
                     </th>
-
                     <th>
-
-                        <span>ISBN</span>
-
+                        ISBN
                         <a asp-page="./Gestion"
                            asp-route-orden="asc"
-                           class="btn btn-sm btn-outline-secondary ms-2"
+                           class="btn btn-sm btn-outline-light ms-2"
                            title="Menor a mayor">
                             ↑
                         </a>
-
                         <a asp-page="./Gestion"
                            asp-route-orden="desc"
-                           class="btn btn-sm btn-outline-secondary"
+                           class="btn btn-sm btn-outline-light"
                            title="Mayor a menor">
                             ↓
                         </a>
-
                     </th>
-
-                    <th>
-                        Título
-                    </th>
-
-                    <th>
-                        Autor
-                    </th>
-
-                    <th>
-                        Categoría
-                    </th>
-
+                    <th>Título</th>
+                    <th>Autor</th>
+                    <th>Categoría</th>
                 </tr>
 
             </thead>
@@ -162,7 +238,7 @@
                 {
                     <tr>
                         <td colspan="5"
-                            class="text-center">
+                            class="text-center text-muted">
                             No hay libros registrados.
                         </td>
                     </tr>
@@ -172,31 +248,15 @@
                     @foreach (var libro in Model.Libros)
                     {
                         <tr>
-
                             <td class="text-center">
-
                                 <input type="checkbox"
                                        class="checkLibro"
                                        value="@libro.ISBN" />
-
                             </td>
-
-                            <td>
-                                @libro.ISBN
-                            </td>
-
-                            <td>
-                                @libro.Titulo
-                            </td>
-
-                            <td>
-                                @libro.Autor
-                            </td>
-
-                            <td>
-                                @libro.Categoria
-                            </td>
-
+                            <td>@libro.ISBN</td>
+                            <td>@libro.Titulo</td>
+                            <td>@libro.Autor</td>
+                            <td>@libro.Categoria</td>
                         </tr>
                     }
                 }
@@ -209,16 +269,23 @@
 
 </div>
 
+@section Scripts {
 <script>
 
-    const checks =
-        document.querySelectorAll(".checkLibro");
+    // Select All checkbox
+    const checkAll = document.getElementById("checkAll");
+    const checks = document.querySelectorAll(".checkLibro");
+    const botonEliminar = document.getElementById("btnEliminar");
+    const campoSeleccionados = document.getElementById("LibrosSeleccionados");
 
-    const botonEliminar =
-        document.getElementById("btnEliminar");
-
-    const campoSeleccionados =
-        document.getElementById("LibrosSeleccionados");
+    checkAll.addEventListener("change", function ()
+    {
+        checks.forEach(function (check)
+        {
+            check.checked = checkAll.checked;
+        });
+        actualizarSeleccion();
+    });
 
     function actualizarSeleccion()
     {
@@ -232,19 +299,14 @@
             }
         });
 
-        campoSeleccionados.value =
-            seleccionados.join(",");
-
-        botonEliminar.disabled =
-            seleccionados.length === 0;
+        campoSeleccionados.value = seleccionados.join(",");
+        botonEliminar.disabled = seleccionados.length === 0;
     }
 
     checks.forEach(function (check)
     {
-        check.addEventListener(
-            "change",
-            actualizarSeleccion
-        );
+        check.addEventListener("change", actualizarSeleccion);
     });
 
 </script>
+}

@@ -1,0 +1,153 @@
+@page
+@model GestiónDeBiblioteca.Pages.ReportesModel
+
+<div class="container mt-4">
+
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold">
+            Reportes
+        </h1>
+        <p class="lead text-muted">
+            Visualización gráfica del catálogo usando Graphviz.
+        </p>
+    </div>
+
+    @* ========== SELECCIONAR TIPO DE REPORTE ========== *@
+    <div class="row mb-4">
+
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-sm h-100 border-primary">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-primary">Árbol AVL por ISBN</h5>
+                    <p class="card-text text-muted">
+                        Estructura del árbol AVL indexado por ISBN.
+                    </p>
+                    <form method="post" asp-page-handler="ArbolISBN">
+                        <button type="submit"
+                                class="btn btn-primary w-100">
+                            Generar Diagrama
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-sm h-100 border-success">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-success">Estructura de Categorías</h5>
+                    <p class="card-text text-muted">
+                        Jerarquía completa de categorías y subcategorías.
+                    </p>
+                    <form method="post" asp-page-handler="EstructuraCategorias">
+                        <button type="submit"
+                                class="btn btn-success w-100">
+                            Generar Diagrama
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-sm h-100 border-warning">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-warning">Libros por Categoría</h5>
+                    <p class="card-text text-muted">
+                        Libros ordenados por ISBN de una categoría.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    @* ========== LIBROS POR CATEGORÍA ========== *@
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-warning text-dark">
+            <h4 class="mb-0">Libros de una Categoría (Graphviz)</h4>
+        </div>
+        <div class="card-body">
+            <form method="post" asp-page-handler="LibrosCategoria" class="row g-3 mb-4">
+                <div class="col-md-8">
+                    <select asp-for="CategoriaSeleccionada"
+                            asp-items="Model.OpcionesCategorias"
+                            class="form-select"
+                            required>
+                        <option value="">-- Seleccione una categoría --</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <button type="submit"
+                            class="btn btn-warning w-100">
+                        Generar Diagrama
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @* ========== DIAGRAMA ACTUAL ========== *@
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-secondary text-white">
+            <h4 class="mb-0">Diagrama Generado</h4>
+        </div>
+        <div class="card-body text-center">
+            <div id="graficoGraphviz" style="min-height: 200px;">
+                <p class="text-muted">Seleccione un tipo de reporte para generar el diagrama.</p>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+<script>
+    // DOT data from server-side rendering
+    var dotData = @if (Model.DotCategorias != null)
+    {
+        <text>"@Html.Raw(Model.DotCategorias.Replace("\\", "\\\\").Replace("\"", "\\\"").Replace("\n", "\\n").Replace("\r", ""))"</text>
+    }
+    else if (Model.DotLibrosCategoria != null)
+    {
+        <text>"@Html.Raw(Model.DotLibrosCategoria.Replace("\\", "\\\\").Replace("\"", "\\\"").Replace("\n", "\\n").Replace("\r", ""))"</text>
+    }
+    else
+    {
+        <text>null</text>
+    }
+    ;
+
+    function renderizarDot(dot) {
+        var container = document.getElementById('graficoGraphviz');
+
+        if (!dot || dot.trim() === '') {
+            container.innerHTML = '<p class="text-muted">No hay datos para mostrar.</p>';
+            return;
+        }
+
+        try {
+            var viz = new Viz();
+            viz.renderSVGElement(dot)
+                .then(function(svg) {
+                    container.innerHTML = '';
+                    svg.style.maxWidth = '100%';
+                    svg.style.height = 'auto';
+                    container.appendChild(svg);
+                })
+                .catch(function(err) {
+                    container.innerHTML = '<div class="alert alert-danger">Error renderizando: ' + err.message + '</div>';
+                });
+        } catch (e) {
+            container.innerHTML = '<div class="alert alert-warning">viz.js no disponible. Verifique la conexión a internet.</div>';
+        }
+    }
+
+    // Render on page load if DOT data exists
+    window.addEventListener('load', function() {
+        if (dotData) {
+            renderizarDot(dotData);
+        }
+    });
+</script>
+}

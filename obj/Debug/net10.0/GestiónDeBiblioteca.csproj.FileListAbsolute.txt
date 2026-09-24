@@ -96,3 +96,5 @@ C:\Users\kevin\source\repos\GestiónDeBiblioteca\GestiónDeBiblioteca\obj\Debug\
 C:\Users\kevin\source\repos\GestiónDeBiblioteca\GestiónDeBiblioteca\obj\Debug\net10.0\ref\GestiónDeBiblioteca.dll
 C:\Users\kevin\source\repos\GestiónDeBiblioteca\GestiónDeBiblioteca\obj\Debug\net10.0\GestiónDeBiblioteca.sourcelink.json
 C:\Users\kevin\source\repos\GestiónDeBiblioteca\GestiónDeBiblioteca\obj\Debug\net10.0\compressed\aaqe481pzp-{0}-qcjv9ncb6s-qcjv9ncb6s.gz
+C:\Users\kevin\source\repos\GestiónDeBiblioteca\GestiónDeBiblioteca\obj\Debug\net10.0\compressed\ldwshsdu55-{0}-mqsxzjo3aa-mqsxzjo3aa.gz
+C:\Users\kevin\source\repos\GestiónDeBiblioteca\GestiónDeBiblioteca\obj\Debug\net10.0\compressed\h57z2tsnfc-{0}-tgwhsc4axv-tgwhsc4axv.gz

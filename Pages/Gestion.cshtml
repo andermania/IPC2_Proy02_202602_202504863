@@ -1,0 +1,250 @@
+﻿@page
+@model GestiónDeBiblioteca.Pages.GestionModel
+
+<div class="container mt-4">
+
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold">
+            Gestión de Libros
+        </h1>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+
+        <div class="card-header">
+            <h4 class="mb-0">Registrar Nuevo Libro</h4>
+        </div>
+
+        <div class="card-body">
+
+            <form method="post" asp-page-handler="Registrar">
+
+                <div class="row">
+
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">
+                            ISBN
+                        </label>
+
+                        <input asp-for="ISBN"
+                               type="number"
+                               class="form-control"
+                               required />
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">
+                            Título
+                        </label>
+
+                        <input asp-for="Titulo"
+                               type="text"
+                               class="form-control"
+                               required />
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">
+                            Autor
+                        </label>
+
+                        <input asp-for="Autor"
+                               type="text"
+                               class="form-control"
+                               required />
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">
+                            Categoría
+                        </label>
+
+                        <select asp-for="Categoria"
+                                class="form-select"
+                                required>
+
+                            <option value="">
+                                Seleccione una categoría
+                            </option>
+
+                        </select>
+                    </div>
+
+                </div>
+
+                <button type="submit"
+                        class="btn btn-success">
+                    Registrar Libro
+                </button>
+
+            </form>
+
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+
+        <h3 class="mb-0">
+            Libros Registrados
+        </h3>
+
+        <form method="post"
+              asp-page-handler="Eliminar"
+              id="formEliminar">
+
+            <input type="hidden"
+                   id="LibrosSeleccionados"
+                   name="LibrosSeleccionados"
+                   value="" />
+
+            <button type="submit"
+                    id="btnEliminar"
+                    class="btn btn-danger"
+                    disabled>
+                Eliminar
+            </button>
+
+        </form>
+
+    </div>
+
+    <div class="table-responsive">
+
+        <table class="table table-bordered table-hover">
+
+            <thead>
+
+                <tr>
+
+                    <th style="width: 50px;">
+                        Seleccionar
+                    </th>
+
+                    <th>
+
+                        <span>ISBN</span>
+
+                        <a asp-page="./Gestion"
+                           asp-route-orden="asc"
+                           class="btn btn-sm btn-outline-secondary ms-2"
+                           title="Menor a mayor">
+                            ↑
+                        </a>
+
+                        <a asp-page="./Gestion"
+                           asp-route-orden="desc"
+                           class="btn btn-sm btn-outline-secondary"
+                           title="Mayor a menor">
+                            ↓
+                        </a>
+
+                    </th>
+
+                    <th>
+                        Título
+                    </th>
+
+                    <th>
+                        Autor
+                    </th>
+
+                    <th>
+                        Categoría
+                    </th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                @if (Model.Libros.Length == 0)
+                {
+                    <tr>
+                        <td colspan="5"
+                            class="text-center">
+                            No hay libros registrados.
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var libro in Model.Libros)
+                    {
+                        <tr>
+
+                            <td class="text-center">
+
+                                <input type="checkbox"
+                                       class="checkLibro"
+                                       value="@libro.ISBN" />
+
+                            </td>
+
+                            <td>
+                                @libro.ISBN
+                            </td>
+
+                            <td>
+                                @libro.Titulo
+                            </td>
+
+                            <td>
+                                @libro.Autor
+                            </td>
+
+                            <td>
+                                @libro.Categoria
+                            </td>
+
+                        </tr>
+                    }
+                }
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+<script>
+
+    const checks =
+        document.querySelectorAll(".checkLibro");
+
+    const botonEliminar =
+        document.getElementById("btnEliminar");
+
+    const campoSeleccionados =
+        document.getElementById("LibrosSeleccionados");
+
+    function actualizarSeleccion()
+    {
+        let seleccionados = [];
+
+        checks.forEach(function (check)
+        {
+            if (check.checked)
+            {
+                seleccionados.push(check.value);
+            }
+        });
+
+        campoSeleccionados.value =
+            seleccionados.join(",");
+
+        botonEliminar.disabled =
+            seleccionados.length === 0;
+    }
+
+    checks.forEach(function (check)
+    {
+        check.addEventListener(
+            "change",
+            actualizarSeleccion
+        );
+    });
+
+</script>

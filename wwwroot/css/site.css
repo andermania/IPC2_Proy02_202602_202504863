@@ -68,7 +68,7 @@ body {
 
 .boton-tarjeta {
     width: 300px;
-    height: 500px;
+    height: 100px;
     /* También podrías usar:
         background-image: url("textura.jpg");
         background-size: cover;
@@ -80,7 +80,7 @@ body {
     justify-content: center;
     align-items: center;
     color: white;
-    font-size: 40px;
+    font-size: 25px;
     font-weight: bold;
     text-align: center;
     cursor: pointer;
@@ -108,7 +108,7 @@ body {
 }
 
 .boton-catalogo {
-    background: linear-gradient(135deg, #8B5A2B, #4A2C1A);
+    background: linear-gradient(135deg, #DC2626, #7F1D1D);
 }
 
 .boton-gestion {

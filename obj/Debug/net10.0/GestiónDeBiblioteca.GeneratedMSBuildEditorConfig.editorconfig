@@ -27,6 +27,10 @@ build_property.EnableCodeStyleSeverity =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRXJyb3IuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/kevin/source/repos/GestiónDeBiblioteca/GestiónDeBiblioteca/Pages/Gestion.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcR2VzdGlvbi5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/kevin/source/repos/GestiónDeBiblioteca/GestiónDeBiblioteca/Pages/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 

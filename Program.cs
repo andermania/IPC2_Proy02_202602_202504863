@@ -1,8 +1,10 @@
+using GestiónDeBiblioteca.Controlladores;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
-
+builder.Services.AddSingleton<CatalogoController>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

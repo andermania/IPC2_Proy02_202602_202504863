@@ -94,4 +94,5 @@ C:\Users\kevin\source\repos\GestiónDeBiblioteca\GestiónDeBiblioteca\obj\Debug\
 C:\Users\kevin\source\repos\GestiónDeBiblioteca\GestiónDeBiblioteca\obj\Debug\net10.0\GestiónDeBiblioteca.pdb
 C:\Users\kevin\source\repos\GestiónDeBiblioteca\GestiónDeBiblioteca\obj\Debug\net10.0\GestiónDeBiblioteca.genruntimeconfig.cache
 C:\Users\kevin\source\repos\GestiónDeBiblioteca\GestiónDeBiblioteca\obj\Debug\net10.0\ref\GestiónDeBiblioteca.dll
-C:\Users\kevin\source\repos\GestiónDeBiblioteca\GestiónDeBiblioteca\obj\Debug\net10.0\compressed\aaqe481pzp-{0}-wbv7ivayru-wbv7ivayru.gz
+C:\Users\kevin\source\repos\GestiónDeBiblioteca\GestiónDeBiblioteca\obj\Debug\net10.0\GestiónDeBiblioteca.sourcelink.json
+C:\Users\kevin\source\repos\GestiónDeBiblioteca\GestiónDeBiblioteca\obj\Debug\net10.0\compressed\aaqe481pzp-{0}-qcjv9ncb6s-qcjv9ncb6s.gz

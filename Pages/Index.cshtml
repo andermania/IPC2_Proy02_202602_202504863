@@ -1,6 +1,7 @@
 ﻿@page
 @model IndexModel
 @{
+    
     ViewData["Title"] = "Home page";
     ViewData["BodyClass"] = "pagina1";
 }
@@ -11,6 +12,13 @@
         <h1>BIBLIOTECA</h1>
         <p>Sistema Inteligente de Gestión de Catálogo</p>
     </div>
+    @if (!string.IsNullOrEmpty(Model.MensajeExito))
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @Model.MensajeExito
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
     <div class="contenedor-tarjetas">
         <div class="boton-tarjeta boton-catalogo" onclick="window.location.href='/Catalogo'">
             <span>CATÁLOGO</span>
@@ -24,5 +32,13 @@
         <div class="boton-tarjeta boton-reportes" onclick="window.location.href='/Reportes'">
             <span>REPORTES</span>
         </div>
+    </div>
+    <div class="mt-4">
+        <form method="post" asp-page-handler="Reiniciar" onsubmit="return confirm('¿Inicializar el sistema? Se borrarán todos los datos en memoria.');">
+            <button type="submit" class="btn btn-success">
+                Inicializar sistema (vaciar catálogo)
+            </button>
+            <input type="text"/>
+        </form>
     </div>
 </div>

@@ -47,11 +47,18 @@ namespace GestiónDeBiblioteca.Model
         }
 
         /// <summary>
-        /// Retorna la ruta completa de la categoría (ej: "Raíz > Ciencia > Física").
+        /// Retorna la ruta completa de la categoría (ej: "Ciencia > Física").
+        /// Excluye la raíz virtual "Biblioteca" para rutas limpias en la UI.
         /// </summary>
         public string ObtenerRutaCompleta()
         {
             if (Padre == null)
+            {
+                return Nombre;
+            }
+
+            // No incluir la raíz virtual en la ruta visible
+            if (Padre.Padre == null && Padre.Nombre == "Biblioteca")
             {
                 return Nombre;
             }

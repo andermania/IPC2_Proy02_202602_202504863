@@ -1,0 +1,4 @@
+bin/
+obj/
+wwwroot/graphviz/*.svg
+wwwroot/graphviz/*.dot

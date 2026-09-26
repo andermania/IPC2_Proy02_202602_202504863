@@ -171,43 +171,50 @@ namespace GestiónDeBiblioteca.Pages
 
         /// <summary>
         /// Carga los combos de categorías y subcategorías desde el árbol N-ario.
+        /// Usa arreglos nativos (sin List) para cumplir restricción de TDAs propios.
         /// </summary>
         private void CargarCombos()
         {
             Categoria[] categoriasRaiz = catalogo.ObtenerCategoriasRaiz();
 
-            List<SelectListItem> opcionesCategorias = new List<SelectListItem>();
+            SelectListItem[] opcionesCategorias = new SelectListItem[categoriasRaiz.Length];
 
             for (int i = 0; i < categoriasRaiz.Length; i++)
             {
-                opcionesCategorias.Add(new SelectListItem
+                opcionesCategorias[i] = new SelectListItem
                 {
                     Value = categoriasRaiz[i].Nombre,
                     Text = categoriasRaiz[i].Nombre
-                });
+                };
             }
 
             OpcionesCategorias = new SelectList(opcionesCategorias, "Value", "Text");
 
             // Subcategorías: se cargan desde JavaScript al cambiar el combo de categoría
             // Aquí precargamos si ya hay una categoría seleccionada
-            List<SelectListItem> opcionesSubcategorias = new List<SelectListItem>();
+            SelectListItem[] opcionesSubcategorias = Array.Empty<SelectListItem>();
 
             if (!string.IsNullOrWhiteSpace(CategoriaSeleccionada))
             {
                 Categoria? categoria = catalogo.BuscarCategoria(CategoriaSeleccionada);
 
+                if (categoria == null)
+                {
+                    categoria = catalogo.BuscarCategoriaPorNombre(CategoriaSeleccionada);
+                }
+
                 if (categoria != null)
                 {
                     Categoria[] subcategorias = categoria.Hijos.ObtenerTodas();
+                    opcionesSubcategorias = new SelectListItem[subcategorias.Length];
 
                     for (int i = 0; i < subcategorias.Length; i++)
                     {
-                        opcionesSubcategorias.Add(new SelectListItem
+                        opcionesSubcategorias[i] = new SelectListItem
                         {
                             Value = subcategorias[i].Nombre,
                             Text = subcategorias[i].Nombre
-                        });
+                        };
                     }
                 }
             }

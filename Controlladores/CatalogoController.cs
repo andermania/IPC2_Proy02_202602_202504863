@@ -32,6 +32,8 @@ namespace GestiónDeBiblioteca.Controlladores
         /// <summary>
         /// Registra un nuevo libro en todos los índices.
         /// Retorna false si el ISBN ya existe.
+        /// La categoría se resuelve por ruta y, si falla, por nombre global
+        /// (los libros XML referencian solo el nombre hoja).
         /// </summary>
         public bool RegistrarLibro(Libro libro)
         {
@@ -55,6 +57,7 @@ namespace GestiónDeBiblioteca.Controlladores
             else
             {
                 // Si la categoría no existe, crearla como categoría raíz
+                // (BuscarPorRuta ya intentó resolución global para nombres simples)
                 Categoria nuevaCat = arbolCategorias.AgregarCategoria(libro.Categoria);
                 nuevaCat.Libros.Insertar(libro);
             }
@@ -68,7 +71,7 @@ namespace GestiónDeBiblioteca.Controlladores
         /// </summary>
         public bool EliminarLibro(int isbn)
         {
-            // Buscar el libro primero para saber su categoría
+            // Buscar el libro primero para saber su categoría y título
             Libro? libro = arbolISBN.Buscar(isbn);
 
             if (libro == null)
@@ -76,9 +79,9 @@ namespace GestiónDeBiblioteca.Controlladores
                 return false;
             }
 
-            // Eliminar de los tres índices
+            // Eliminar de los tres índices (el AVL de títulos se indexa por título+ISBN)
             bool eliminadoISBN = arbolISBN.Eliminar(isbn);
-            arbolTitulo.Eliminar(isbn);
+            arbolTitulo.Eliminar(libro.Titulo, libro.ISBN);
 
             // Eliminar del árbol de categorías
             Categoria? categoria = arbolCategorias.BuscarPorRuta(libro.Categoria);
@@ -196,6 +199,25 @@ namespace GestiónDeBiblioteca.Controlladores
         public Categoria? BuscarCategoria(string ruta)
         {
             return arbolCategorias.BuscarPorRuta(ruta);
+        }
+
+        /// <summary>
+        /// Busca una categoría por nombre en todo el árbol (unicidad global).
+        /// </summary>
+        public Categoria? BuscarCategoriaPorNombre(string nombre)
+        {
+            return arbolCategorias.BuscarPorNombreGlobal(nombre);
+        }
+
+        /// <summary>
+        /// Reinicia todo el catálogo (inicialización sin información previa).
+        /// Limpia los tres índices y el árbol de categorías.
+        /// </summary>
+        public void Reiniciar()
+        {
+            arbolISBN = new ArbolLibrosISBN();
+            arbolTitulo = new ArbolLibrosTitulo();
+            arbolCategorias = new ArbolCategorias();
         }
 
         /// <summary>

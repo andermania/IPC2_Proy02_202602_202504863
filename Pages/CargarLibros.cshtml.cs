@@ -13,23 +13,28 @@ namespace GestiónDeBiblioteca.Pages
     {
         private readonly CatalogoController catalogo;
         private readonly XmlService xmlService;
-        private readonly IWebHostEnvironment environment;
 
         public XmlService.ResultadoCarga? Resultado { get; set; }
         public string? MensajeExito { get; set; }
         public string? MensajeError { get; set; }
 
-        public CargarLibrosModel(
-            CatalogoController catalogo,
-            IWebHostEnvironment environment)
+        public CargarLibrosModel(CatalogoController catalogo)
         {
             this.catalogo = catalogo;
             this.xmlService = new XmlService(catalogo);
-            this.environment = environment;
         }
 
         public void OnGet()
         {
+        }
+
+        /// <summary>
+        /// Descarga un XML de ejemplo con el formato esperado.
+        /// </summary>
+        public IActionResult OnGetXmlEjemplo()
+        {
+            string xml = XmlService.GenerarXmlEjemplo();
+            return Content(xml, "application/xml", System.Text.Encoding.UTF8);
         }
 
         public IActionResult OnPostCargar(IFormFile? archivoXml)

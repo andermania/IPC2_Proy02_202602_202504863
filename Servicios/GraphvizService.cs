@@ -50,12 +50,14 @@ namespace GestiónDeBiblioteca.Servicios
             for (int i = 0; i < hijos.Length; i++)
             {
                 Categoria hijo = hijos[i];
-                string nombreLimpio = LimpiarNombreDot(hijo.Nombre);
-                string padreLimpio = LimpiarNombreDot(nodo.Nombre);
+                // ID único por ruta completa (evita colisiones); etiqueta legible escapada
+                string idHijo = EscaparEtiquetaDot(hijo.ObtenerRutaCompleta());
+                string idPadre = EscaparEtiquetaDot(nodo == catalogo.ObtenerArbolCategorias().ObtenerRaiz() ? nodo.Nombre : nodo.ObtenerRutaCompleta());
+                string etiquetaHijo = EscaparEtiquetaDot(hijo.Nombre);
 
                 string color = hijo.EsHoja() ? "#C8E6C9" : "#BBDEFB";
-                dot.AppendLine($"  \"{padreLimpio}\" -> \"{nombreLimpio}\";");
-                dot.AppendLine($"  \"{nombreLimpio}\" [label=\"{hijo.Nombre}\\n({hijo.Libros.ObtenerCantidad()} libros)\", fillcolor=\"{color}\"];");
+                dot.AppendLine($"  \"{idPadre}\" -> \"{idHijo}\";");
+                dot.AppendLine($"  \"{idHijo}\" [label=\"{etiquetaHijo}\\n({hijo.Libros.ObtenerCantidad()} libros)\", fillcolor=\"{color}\"];");
 
                 GenerarDotCategoriasRecursivo(hijo, dot);
             }
@@ -84,18 +86,18 @@ namespace GestiónDeBiblioteca.Servicios
             dot.AppendLine("digraph Libros {");
             dot.AppendLine("  rankdir=TB;");
             dot.AppendLine("  node [shape=record, style=filled, fontname=\"Arial\"];");
-            dot.AppendLine($"  label=\"Libros de {categoria.Nombre} (orden ascendente por ISBN)\";");
+            dot.AppendLine($"  label=\"Libros de {EscaparEtiquetaDot(categoria.Nombre)} (orden ascendente por ISBN)\";");
             dot.AppendLine("  fontsize=18;");
             dot.AppendLine("  labelloc=t;");
 
-            string catLimpia = LimpiarNombreDot(categoria.Nombre);
-            dot.AppendLine($"  \"{catLimpia}\" [label=\"{categoria.Nombre}\", shape=box, fillcolor=\"#1565C0\", fontcolor=white, fontsize=14];");
+            string catLimpia = EscaparEtiquetaDot(categoria.ObtenerRutaCompleta());
+            dot.AppendLine($"  \"{catLimpia}\" [label=\"{EscaparEtiquetaDot(categoria.Nombre)}\", shape=box, fillcolor=\"#1565C0\", fontcolor=white, fontsize=14];");
 
             for (int i = 0; i < libros.Length; i++)
             {
                 Libro libro = libros[i];
                 string nodoLibro = $"libro_{libro.ISBN}";
-                string label = $"ISBN: {libro.ISBN}\\n{libro.Titulo}\\n{libro.Autor}";
+                string label = $"ISBN: {libro.ISBN}\\n{EscaparEtiquetaDot(libro.Titulo)}\\n{EscaparEtiquetaDot(libro.Autor)}";
 
                 dot.AppendLine($"  \"{nodoLibro}\" [label=\"{label}\", fillcolor=\"#FFF9C4\"];");
 
@@ -161,7 +163,7 @@ namespace GestiónDeBiblioteca.Servicios
                 : "#A5D6A7"; // Verde si equilibrado
 
             string tituloCorto = nodo.Libro.Titulo.Substring(0, Math.Min(15, nodo.Libro.Titulo.Length));
-            string label = $"{nodo.Libro.ISBN}\\n{tituloCorto}";
+            string label = $"{nodo.Libro.ISBN}\\n{EscaparEtiquetaDot(tituloCorto)}";
             dot.AppendLine($"  \"{nodoId}\" [label=\"{label}\", fillcolor=\"{color}\"];");
 
             if (nodo.Izquierda != null)
@@ -182,7 +184,7 @@ namespace GestiónDeBiblioteca.Servicios
         /// </summary>
         private string GenerarDotError(string mensaje)
         {
-            return $"digraph Error {{ node [shape=box, style=filled, fillcolor=\"#FFEBEE\", fontname=\"Arial\"]; error [label=\"{mensaje}\", fontcolor=\"#C62828\"]; }}";
+            return $"digraph Error {{ node [shape=box, style=filled, fillcolor=\"#FFEBEE\", fontname=\"Arial\"]; error [label=\"{EscaparEtiquetaDot(mensaje)}\", fontcolor=\"#C62828\"]; }}";
         }
 
         /// <summary>
@@ -190,14 +192,29 @@ namespace GestiónDeBiblioteca.Servicios
         /// </summary>
         private string GenerarDotInfo(string mensaje)
         {
-            return $"digraph Info {{ node [shape=box, style=filled, fillcolor=\"#E8F5E9\", fontname=\"Arial\"]; info [label=\"{mensaje}\", fontcolor=\"#2E7D32\"]; }}";
+            return $"digraph Info {{ node [shape=box, style=filled, fillcolor=\"#E8F5E9\", fontname=\"Arial\"]; info [label=\"{EscaparEtiquetaDot(mensaje)}\", fontcolor=\"#2E7D32\"]; }}";
         }
 
         // ===================== UTILIDADES =====================
 
         private string LimpiarNombreDot(string nombre)
         {
-            return nombre.Replace("\"", "\\\"").Replace(" ", "_");
+            if (nombre == null)
+            {
+                return "";
+            }
+
+            // Escapar para etiquetas DOT entre comillas: barra, comillas, saltos
+            return nombre
+                .Replace("\\", "\\\\")
+                .Replace("\"", "\\\"")
+                .Replace("\r", "")
+                .Replace("\n", "\\n");
+        }
+
+        private string EscaparEtiquetaDot(string texto)
+        {
+            return LimpiarNombreDot(texto);
         }
     }
 }

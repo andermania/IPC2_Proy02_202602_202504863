@@ -30,15 +30,15 @@ namespace GestiónDeBiblioteca.TDA
 
         /// <summary>
         /// Agrega una categoría como hija directa de la raíz.
-        /// Si ya existe, retorna la existente.
+        /// Los nombres son globalmente únicos: si ya existe en cualquier nivel, retorna la existente.
         /// </summary>
         public Categoria AgregarCategoria(string nombre)
         {
-            Categoria? existente = raiz.Hijos.BuscarPorNombre(nombre);
+            Categoria? global = BuscarPorNombreGlobal(nombre);
 
-            if (existente != null)
+            if (global != null)
             {
-                return existente;
+                return global;
             }
 
             Categoria nueva = new Categoria(nombre, raiz);
@@ -50,11 +50,30 @@ namespace GestiónDeBiblioteca.TDA
         /// <summary>
         /// Agrega una subcategoría bajo un padre específico.
         /// La ruta del padre se indica con nombres separados por '>' (ej: "Ciencia > Física").
+        /// El padre se resuelve por ruta y, si falla, por nombre global (nombres únicos).
+        /// Si el nombre hija ya existe en cualquier nivel, retorna la existente (unicidad global).
         /// Si el padre no existe, se crean las categorías intermedias.
         /// </summary>
         public Categoria AgregarSubcategoria(string rutaPadre, string nombreHija)
         {
-            Categoria padre = BuscarOCrearPorRuta(rutaPadre);
+            Categoria? globalHija = BuscarPorNombreGlobal(nombreHija);
+
+            if (globalHija != null)
+            {
+                return globalHija;
+            }
+
+            Categoria? padre = BuscarPorRuta(rutaPadre);
+
+            if (padre == null)
+            {
+                padre = BuscarPorNombreGlobal(rutaPadre.Trim());
+            }
+
+            if (padre == null)
+            {
+                padre = BuscarOCrearPorRuta(rutaPadre);
+            }
 
             Categoria? existente = padre.Hijos.BuscarPorNombre(nombreHija);
 
@@ -72,6 +91,8 @@ namespace GestiónDeBiblioteca.TDA
         /// <summary>
         /// Busca una categoría por su ruta completa (ej: "Ciencia > Física > Mecánica").
         /// Si no existe, la crea iterativamente.
+        /// Respeta unicidad global: antes de crear un intermedio verifica si el
+        /// nombre ya existe en cualquier nivel y lo reutiliza como paso de la ruta.
         /// </summary>
         private Categoria BuscarOCrearPorRuta(string ruta)
         {
@@ -91,9 +112,21 @@ namespace GestiónDeBiblioteca.TDA
 
                 if (encontrada == null)
                 {
-                    encontrada = new Categoria(nombreLimpio, actual);
-                    actual.Hijos.InsertarOrdenado(encontrada);
-                    totalCategorias++;
+                    // Reutilizar nodo global si ya existe (evita duplicados por ruta parcial)
+                    encontrada = BuscarPorNombreGlobal(nombreLimpio);
+
+                    if (encontrada == null)
+                    {
+                        encontrada = new Categoria(nombreLimpio, actual);
+                        actual.Hijos.InsertarOrdenado(encontrada);
+                        totalCategorias++;
+                    }
+                    else if (encontrada.Padre != actual)
+                    {
+                        // El nodo existe en otra rama: la ruta es inconsistente con la
+                        // unicidad global. Se retorna el nodo global para no duplicar.
+                        return encontrada;
+                    }
                 }
 
                 actual = encontrada;
@@ -105,11 +138,14 @@ namespace GestiónDeBiblioteca.TDA
         /// <summary>
         /// Busca una categoría por ruta completa (ej: "Ciencia > Física").
         /// Retorna null si no existe.
+        /// Si la ruta tiene un solo segmento, se busca globalmente por nombre
+        /// (los nombres son únicos en todo el árbol).
         /// </summary>
         public Categoria? BuscarPorRuta(string ruta)
         {
             string[] partes = ruta.Split('>');
             Categoria actual = raiz;
+            bool esPrimerSegmento = true;
 
             for (int i = 0; i < partes.Length; i++)
             {
@@ -120,17 +156,85 @@ namespace GestiónDeBiblioteca.TDA
                     continue;
                 }
 
+                // Ignorar prefijo de raíz virtual ("Biblioteca > ...")
+                if (esPrimerSegmento && string.Equals(nombreLimpio, raiz.Nombre, StringComparison.OrdinalIgnoreCase))
+                {
+                    esPrimerSegmento = false;
+                    continue;
+                }
+
+                esPrimerSegmento = false;
+
                 Categoria? encontrada = actual.Hijos.BuscarPorNombre(nombreLimpio);
 
                 if (encontrada == null)
                 {
+                    // Si es búsqueda de un solo nombre, intentar global
+                    // (ej: libro XML referencia solo "Fantasía" aunque viva bajo "Ficción").
+                    if (partes.Length == 1)
+                    {
+                        return BuscarPorNombreGlobal(nombreLimpio);
+                    }
+
                     return null;
                 }
 
                 actual = encontrada;
             }
 
+            // Si la ruta era solo la raíz virtual, retornar la raíz
+            if (actual == raiz && esPrimerSegmento)
+            {
+                return raiz;
+            }
+
             return actual;
+        }
+
+        /// <summary>
+        /// Busca una categoría por nombre en todo el árbol (DFS, ignora mayúsculas).
+        /// Los nombres son globalmente únicos según especificación.
+        /// Retorna null si no existe.
+        /// </summary>
+        public Categoria? BuscarPorNombreGlobal(string nombre)
+        {
+            if (string.IsNullOrWhiteSpace(nombre))
+            {
+                return null;
+            }
+
+            string objetivo = nombre.Trim();
+            return BuscarPorNombreGlobalRecursivo(raiz, objetivo);
+        }
+
+        private Categoria? BuscarPorNombreGlobalRecursivo(Categoria nodo, string objetivo)
+        {
+            if (nodo != raiz && string.Equals(nodo.Nombre, objetivo, StringComparison.OrdinalIgnoreCase))
+            {
+                return nodo;
+            }
+
+            Categoria[] hijos = nodo.Hijos.ObtenerTodas();
+            for (int i = 0; i < hijos.Length; i++)
+            {
+                Categoria? hallada = BuscarPorNombreGlobalRecursivo(hijos[i], objetivo);
+                if (hallada != null)
+                {
+                    return hallada;
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Reinicia el árbol a su estado inicial (solo raíz virtual).
+        /// Se usa para la función de Inicialización de la interfaz.
+        /// </summary>
+        public void Reiniciar()
+        {
+            raiz = new Categoria("Biblioteca");
+            totalCategorias = 1;
         }
 
         /// <summary>
@@ -188,12 +292,12 @@ namespace GestiónDeBiblioteca.TDA
         /// </summary>
         public Categoria[] ObtenerTodasLasCategorias()
         {
-            ListaEnlazadaSimple<Categoria> lista = new ListaEnlazadaSimple<Categoria>();
+            ListaSimpleCategoria lista = new ListaSimpleCategoria();
             RecorrerPreorden(raiz, lista);
             return lista.ObtenerArray();
         }
 
-        private void RecorrerPreorden(Categoria nodo, ListaEnlazadaSimple<Categoria> lista)
+        private void RecorrerPreorden(Categoria nodo, ListaSimpleCategoria lista)
         {
             // No incluir la raíz virtual en la lista
             if (nodo != raiz)
@@ -263,23 +367,23 @@ namespace GestiónDeBiblioteca.TDA
     }
 
     /// <summary>
-    /// Lista enlazada genérica simple para uso interno del árbol de categorías.
-    /// Permitida ya que es un TDA implementado por el estudiante.
+    /// Lista enlazada simple concreta para categorías (TDA propio, sin genéricos).
+    /// Uso interno del árbol de categorías para recorridos preorden.
     /// </summary>
-    public class ListaEnlazadaSimple<T>
+    public class ListaSimpleCategoria
     {
-        private NodoSimple<T>? cabeza;
+        private NodoSimpleCategoria? cabeza;
         private int contador;
 
-        public ListaEnlazadaSimple()
+        public ListaSimpleCategoria()
         {
             cabeza = null;
             contador = 0;
         }
 
-        public void Agregar(T elemento)
+        public void Agregar(Categoria elemento)
         {
-            NodoSimple<T> nuevo = new NodoSimple<T>(elemento);
+            NodoSimpleCategoria nuevo = new NodoSimpleCategoria(elemento);
 
             if (cabeza == null)
             {
@@ -287,7 +391,7 @@ namespace GestiónDeBiblioteca.TDA
             }
             else
             {
-                NodoSimple<T> actual = cabeza;
+                NodoSimpleCategoria actual = cabeza;
                 while (actual.Siguiente != null)
                 {
                     actual = actual.Siguiente;
@@ -298,10 +402,10 @@ namespace GestiónDeBiblioteca.TDA
             contador++;
         }
 
-        public T[] ObtenerArray()
+        public Categoria[] ObtenerArray()
         {
-            T[] array = new T[contador];
-            NodoSimple<T>? actual = cabeza;
+            Categoria[] array = new Categoria[contador];
+            NodoSimpleCategoria? actual = cabeza;
             int i = 0;
 
             while (actual != null)
@@ -321,14 +425,14 @@ namespace GestiónDeBiblioteca.TDA
     }
 
     /// <summary>
-    /// Nodo genérico para lista enlazada simple.
+    /// Nodo concreto para lista enlazada simple de categorías (sin genéricos).
     /// </summary>
-    public class NodoSimple<T>
+    public class NodoSimpleCategoria
     {
-        public T Dato { get; set; }
-        public NodoSimple<T>? Siguiente { get; set; }
+        public Categoria Dato { get; set; }
+        public NodoSimpleCategoria? Siguiente { get; set; }
 
-        public NodoSimple(T dato)
+        public NodoSimpleCategoria(Categoria dato)
         {
             Dato = dato;
             Siguiente = null;

@@ -62,7 +62,7 @@ namespace GestiónDeBiblioteca.TDA
         private NodoTitulo RotarDerecha(NodoTitulo y)
         {
             NodoTitulo x = y.Izquierda!;
-            NodoTitulo B = x.Derecha!;
+            NodoTitulo? B = x.Derecha;
 
             x.Derecha = y;
             y.Izquierda = B;
@@ -76,7 +76,7 @@ namespace GestiónDeBiblioteca.TDA
         private NodoTitulo RotarIzquierda(NodoTitulo x)
         {
             NodoTitulo y = x.Derecha!;
-            NodoTitulo B = y.Izquierda!;
+            NodoTitulo? B = y.Izquierda;
 
             y.Izquierda = x;
             x.Derecha = B;
@@ -156,10 +156,15 @@ namespace GestiónDeBiblioteca.TDA
 
         // ===================== ELIMINACIÓN =====================
 
-        public bool Eliminar(int isbn)
+        /// <summary>
+        /// Elimina un libro del árbol indexado por título.
+        /// La navegación usa título (+ISBN como desempate), igual que la inserción.
+        /// Retorna false si no se encontró.
+        /// </summary>
+        public bool Eliminar(string titulo, int isbn)
         {
             bool eliminado = false;
-            raiz = EliminarRecursivo(raiz, isbn, ref eliminado);
+            raiz = EliminarRecursivo(raiz, titulo, isbn, ref eliminado);
 
             if (eliminado)
             {
@@ -169,42 +174,62 @@ namespace GestiónDeBiblioteca.TDA
             return eliminado;
         }
 
-        private NodoTitulo? EliminarRecursivo(NodoTitulo? actual, int isbn, ref bool eliminado)
+        /// <summary>
+        /// Sobrecarga por objeto libro.
+        /// </summary>
+        public bool Eliminar(Libro libro)
+        {
+            return Eliminar(libro.Titulo, libro.ISBN);
+        }
+
+        private NodoTitulo? EliminarRecursivo(NodoTitulo? actual, string titulo, int isbn, ref bool eliminado)
         {
             if (actual == null)
             {
                 return null;
             }
 
-            int comparacion = isbn.CompareTo(actual.Libro.ISBN);
+            int comparacion = CompararTitulos(titulo, actual.Libro.Titulo);
 
             if (comparacion < 0)
             {
-                // Buscar en subárbol izquierdo (por ISBN para encontrar el nodo exacto)
-                actual.Izquierda = EliminarRecursivo(actual.Izquierda, isbn, ref eliminado);
+                actual.Izquierda = EliminarRecursivo(actual.Izquierda, titulo, isbn, ref eliminado);
             }
             else if (comparacion > 0)
             {
-                actual.Derecha = EliminarRecursivo(actual.Derecha, isbn, ref eliminado);
+                actual.Derecha = EliminarRecursivo(actual.Derecha, titulo, isbn, ref eliminado);
             }
             else
             {
-                // Nodo encontrado por ISBN
-                eliminado = true;
-
-                if (actual.Izquierda == null)
+                // Mismo título: desempatar por ISBN (igual que en inserción)
+                if (isbn < actual.Libro.ISBN)
                 {
-                    return actual.Derecha;
+                    actual.Izquierda = EliminarRecursivo(actual.Izquierda, titulo, isbn, ref eliminado);
                 }
-                if (actual.Derecha == null)
+                else if (isbn > actual.Libro.ISBN)
                 {
-                    return actual.Izquierda;
+                    actual.Derecha = EliminarRecursivo(actual.Derecha, titulo, isbn, ref eliminado);
                 }
+                else
+                {
+                    // Nodo encontrado (mismo título y mismo ISBN)
+                    eliminado = true;
 
-                // Dos hijos → sucesor inorden
-                NodoTitulo sucesor = ObtenerMinimoNodo(actual.Derecha);
-                actual.Libro = sucesor.Libro;
-                actual.Derecha = EliminarRecursivo(actual.Derecha, sucesor.Libro.ISBN, ref eliminado);
+                    if (actual.Izquierda == null)
+                    {
+                        return actual.Derecha;
+                    }
+                    if (actual.Derecha == null)
+                    {
+                        return actual.Izquierda;
+                    }
+
+                    // Dos hijos → sucesor inorden (mínimo del subárbol derecho)
+                    NodoTitulo sucesor = ObtenerMinimoNodo(actual.Derecha);
+                    actual.Libro = sucesor.Libro;
+                    bool dummy = false;
+                    actual.Derecha = EliminarRecursivo(actual.Derecha, sucesor.Libro.Titulo, sucesor.Libro.ISBN, ref dummy);
+                }
             }
 
             ActualizarAltura(actual);
@@ -241,25 +266,35 @@ namespace GestiónDeBiblioteca.TDA
         // ===================== BÚSQUEDA =====================
 
         /// <summary>
-        /// Busca un libro por ISBN en este árbol.
+        /// Busca un libro por ISBN en este árbol mediante recorrido completo.
+        /// El árbol está ordenado por título, por lo que no se puede navegar por ISBN.
+        /// O(n). El índice principal por ISBN es ArbolLibrosISBN.
         /// </summary>
         public Libro? BuscarPorISBN(int isbn)
         {
-            NodoTitulo? actual = raiz;
+            return BuscarPorISBNRecursivo(raiz, isbn);
+        }
 
-            while (actual != null)
+        private Libro? BuscarPorISBNRecursivo(NodoTitulo? actual, int isbn)
+        {
+            if (actual == null)
             {
-                if (isbn == actual.Libro.ISBN)
-                {
-                    return actual.Libro;
-                }
-
-                actual = isbn < actual.Libro.ISBN
-                    ? actual.Izquierda
-                    : actual.Derecha;
+                return null;
             }
 
-            return null;
+            if (actual.Libro.ISBN == isbn)
+            {
+                return actual.Libro;
+            }
+
+            Libro? enIzq = BuscarPorISBNRecursivo(actual.Izquierda, isbn);
+
+            if (enIzq != null)
+            {
+                return enIzq;
+            }
+
+            return BuscarPorISBNRecursivo(actual.Derecha, isbn);
         }
 
         /// <summary>

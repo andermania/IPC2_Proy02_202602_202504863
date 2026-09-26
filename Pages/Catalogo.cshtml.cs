@@ -131,23 +131,24 @@ namespace GestiónDeBiblioteca.Pages
 
             Categoria[] todasLasCategorias = catalogo.ObtenerTodasLasCategorias();
 
-            List<SelectListItem> opcionesCategorias = new List<SelectListItem>();
-            List<SelectListItem> opcionesTodas = new List<SelectListItem>();
+            // Arreglos nativos en lugar de List (restricción TDAs propios)
+            SelectListItem[] opcionesCategorias = new SelectListItem[todasLasCategorias.Length];
+            SelectListItem[] opcionesTodas = new SelectListItem[todasLasCategorias.Length];
 
             for (int i = 0; i < todasLasCategorias.Length; i++)
             {
-                opcionesCategorias.Add(new SelectListItem
+                opcionesCategorias[i] = new SelectListItem
                 {
                     Value = todasLasCategorias[i].Nombre,
                     Text = todasLasCategorias[i].ObtenerRutaCompleta()
-                });
+                };
 
-                opcionesTodas.Add(new SelectListItem
+                opcionesTodas[i] = new SelectListItem
                 {
                     Value = todasLasCategorias[i].ObtenerRutaCompleta(),
                     Text = todasLasCategorias[i].ObtenerRutaCompleta()
                         + $" ({todasLasCategorias[i].Libros.ObtenerCantidad()} libros)"
-                });
+                };
             }
 
             OpcionesCategorias = new SelectList(opcionesCategorias, "Value", "Text");

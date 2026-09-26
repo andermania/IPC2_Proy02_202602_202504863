@@ -88,18 +88,31 @@ namespace GestiónDeBiblioteca.Pages
         private void CargarComboCategorias()
         {
             Categoria[] todasLasCategorias = catalogo.ObtenerTodasLasCategorias();
-            List<SelectListItem> opciones = new List<SelectListItem>();
+
+            // Primera pasada: contar categorías con libros (sin List)
+            int conLibros = 0;
+            for (int i = 0; i < todasLasCategorias.Length; i++)
+            {
+                if (todasLasCategorias[i].Libros.ObtenerCantidad() > 0)
+                {
+                    conLibros++;
+                }
+            }
+
+            SelectListItem[] opciones = new SelectListItem[conLibros];
+            int pos = 0;
 
             for (int i = 0; i < todasLasCategorias.Length; i++)
             {
                 if (todasLasCategorias[i].Libros.ObtenerCantidad() > 0)
                 {
-                    opciones.Add(new SelectListItem
+                    opciones[pos] = new SelectListItem
                     {
                         Value = todasLasCategorias[i].ObtenerRutaCompleta(),
                         Text = todasLasCategorias[i].ObtenerRutaCompleta()
                             + $" ({todasLasCategorias[i].Libros.ObtenerCantidad()} libros)"
-                    });
+                    };
+                    pos++;
                 }
             }
 

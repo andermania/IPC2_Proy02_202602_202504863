@@ -82,7 +82,7 @@ namespace GestiónDeBiblioteca.TDA
         private NodoISBN RotarDerecha(NodoISBN y)
         {
             NodoISBN x = y.Izquierda!;
-            NodoISBN B = x.Derecha!;
+            NodoISBN? B = x.Derecha;
 
             x.Derecha = y;
             y.Izquierda = B;
@@ -104,7 +104,7 @@ namespace GestiónDeBiblioteca.TDA
         private NodoISBN RotarIzquierda(NodoISBN x)
         {
             NodoISBN y = x.Derecha!;
-            NodoISBN B = y.Izquierda!;
+            NodoISBN? B = y.Izquierda;
 
             y.Izquierda = x;
             x.Derecha = B;

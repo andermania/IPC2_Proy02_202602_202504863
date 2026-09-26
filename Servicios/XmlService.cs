@@ -40,7 +40,7 @@ namespace GestiónDeBiblioteca.Servicios
             public int CategoriasCreadas { get; set; }
             public int LibrosCargados { get; set; }
             public int LibrosDuplicados { get; set; }
-            public ListaEnlazadaSimple<string> Errores { get; set; } = new ListaEnlazadaSimple<string>();
+            public ListaSimpleCadenas Errores { get; set; } = new ListaSimpleCadenas();
         }
 
         /// <summary>
@@ -89,8 +89,9 @@ namespace GestiónDeBiblioteca.Servicios
         /// <summary>
         /// Procesa el elemento listaCategorias del XML.
         /// El atributo "padre" es opcional (categoría raíz si se omite).
+        /// Soporta padres anidados: el padre se resuelve por ruta o por nombre global.
         /// </summary>
-        private int ProcesarCategorias(XElement elemCategorias, ListaEnlazadaSimple<string> errores)
+        private int ProcesarCategorias(XElement elemCategorias, ListaSimpleCadenas errores)
         {
             int creadas = 0;
 
@@ -113,7 +114,7 @@ namespace GestiónDeBiblioteca.Servicios
                 }
             }
 
-            // Segunda pasada: categorías con padre
+            // Segunda pasada: categorías con padre (resolución por ruta o nombre global)
             bool hayCambios = true;
             int iteraciones = 0;
             int totalElementos = elemCategorias.Elements("categoria").Count();
@@ -133,21 +134,58 @@ namespace GestiónDeBiblioteca.Servicios
                         continue;
                     }
 
-                    // Verificar si la categoría ya existe
-                    if (catalogo.BuscarCategoria(padre.Trim() + " > " + nombre) != null)
+                    string nombrePadre = padre.Trim();
+
+                    // Unicidad global: si el nombre ya existe, no se crea de nuevo
+                    if (catalogo.BuscarCategoriaPorNombre(nombre) != null)
                     {
                         continue;
                     }
 
-                    // Verificar si el padre ya existe
-                    Categoria? padreExistente = catalogo.BuscarCategoria(padre.Trim());
+                    // Verificar si el padre ya existe (por ruta o por nombre global)
+                    Categoria? padreExistente = catalogo.BuscarCategoria(nombrePadre);
+
+                    if (padreExistente == null)
+                    {
+                        padreExistente = catalogo.BuscarCategoriaPorNombre(nombrePadre);
+                    }
 
                     if (padreExistente != null)
                     {
-                        catalogo.AgregarSubcategoria(padre.Trim(), nombre);
+                        // Resolver la ruta real del padre para mantener jerarquía correcta
+                        string rutaPadreReal = padreExistente.ObtenerRutaCompleta();
+                        // Quitar prefijo "Biblioteca > " si existe (ruta interna usa ese prefijo)
+                        const string prefijoRaiz = "Biblioteca > ";
+                        if (rutaPadreReal.StartsWith(prefijoRaiz))
+                        {
+                            rutaPadreReal = rutaPadreReal.Substring(prefijoRaiz.Length);
+                        }
+                        else if (rutaPadreReal == "Biblioteca")
+                        {
+                            rutaPadreReal = nombrePadre;
+                        }
+
+                        catalogo.AgregarSubcategoria(rutaPadreReal, nombre);
                         creadas++;
                         hayCambios = true;
                     }
+                }
+            }
+
+            // Reportar categorías cuyo padre nunca se encontró
+            foreach (XElement elem in elemCategorias.Elements("categoria"))
+            {
+                string? padre = elem.Attribute("padre")?.Value;
+                string nombre = elem.Value.Trim();
+
+                if (string.IsNullOrEmpty(nombre) || padre == null || string.IsNullOrEmpty(padre.Trim()))
+                {
+                    continue;
+                }
+
+                if (catalogo.BuscarCategoriaPorNombre(nombre) == null)
+                {
+                    errores.Agregar($"Categoría '{nombre}': padre '{padre.Trim()}' no encontrado.");
                 }
             }
 
@@ -228,7 +266,7 @@ namespace GestiónDeBiblioteca.Servicios
     <categoria>Ciencia</categoria>
     <categoria>Tecnología</categoria>
     <categoria>Historia</categoria>
-    <categoria=""padre""=""Ficción"">Ciencia Ficción</categoria>
+    <categoria padre=""Ficción"">Ciencia Ficción</categoria>
     <categoria padre=""Ficción"">Fantasía</categoria>
     <categoria padre=""Ciencia"">Física</categoria>
     <categoria padre=""Ciencia"">Biología</categoria>

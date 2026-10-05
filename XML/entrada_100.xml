@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+  <listaCategorias>
+    <categoria padre="Ecologia">Estadistica</categoria>
+    <categoria padre="Estadistica">Programacion</categoria>
+    <categoria padre="Catalogo">Ecologia</categoria>
+    <categoria>Catalogo</categoria>
+    <categoria padre="Catalogo">Arquitectura</categoria>
+  </listaCategorias>
+  <listaLibros>
+    <libro><ISBN>719145452</ISBN><titulo>Memoria del Medicina</titulo><autor>Andres Morales</autor><categoria>Programacion</categoria></libro>
+    <libro><ISBN>1836861278</ISBN><titulo>Legado del Derecho</titulo><autor>Clara Reyes</autor><categoria>Arquitectura</categoria></libro>
+    <libro><ISBN>118528856</ISBN><titulo>Cronicas de Fotografia</titulo><autor>Ana Garcia</autor><categoria>Estadistica</categoria></libro>
+    <libro><ISBN>385213221</ISBN><titulo>Introduccion a Arte</titulo><autor>Rosa Cruz</autor><categoria>Estadistica</categoria></libro>
+    <libro><ISBN>650810036</ISBN><titulo>Tratado de Educacion</titulo><autor>Hector Morales</autor><categoria>Arquitectura</categoria></libro>
+    <libro><ISBN>652895335</ISBN><titulo>Introduccion a Comic</titulo><autor>Jorge Cabrera</autor><categoria>Estadistica</categoria></libro>
+    <libro><ISBN>268709552</ISBN><titulo>El Origen Fundamental de Quimica</titulo><autor>Diego Ibarra</autor><categoria>Arquitectura</categoria></libro>
+    <libro><ISBN>391527175</ISBN><titulo>Historia de Comic</titulo><autor>Mario Castro</autor><categoria>Arquitectura</categoria></libro>
+    <libro><ISBN>48395173</ISBN><titulo>Enigma de Zoologia</titulo><autor>Clara Ramirez</autor><categoria>Ecologia</categoria></libro>
+    <libro><ISBN>1288595296</ISBN><titulo>Historia: Memoria Perdido</titulo><autor>Tomas Ramirez</autor><categoria>Arquitectura</categoria></libro>
+    <libro><ISBN>445152461</ISBN><titulo>Cronicas de Criptografia</titulo><autor>Nadia Reyes</autor><categoria>Arquitectura</categoria></libro>
+    <libro><ISBN>517477401</ISBN><titulo>Historia: Origen Nocturno</titulo><autor>Ruben Herrera</autor><categoria>Programacion</categoria></libro>
+    <libro><ISBN>1692085886</ISBN><titulo>Espejo de Programacion</titulo><autor>Hector Garcia</autor><categoria>Arquitectura</categoria></libro>
+    <libro><ISBN>575129989</ISBN><titulo>Introduccion a Algebra</titulo><autor>Roberto Morales</autor><categoria>Estadistica</categoria></libro>
+    <libro><ISBN>413131395</ISBN><titulo>El Atlas Ilustrado de Matematicas</titulo><autor>Ruben Ortiz</autor><categoria>Programacion</categoria></libro>
+    <libro><ISBN>1430934272</ISBN><titulo>Cuento: Origen Oculto</titulo><autor>Jorge Cabrera</autor><categoria>Arquitectura</categoria></libro>
+    <libro><ISBN>1305228841</ISBN><titulo>Introduccion a Fotografia</titulo><autor>Ruben Perez</autor><categoria>Ecologia</categoria></libro>
+    <libro><ISBN>100751773</ISBN><titulo>La Completo Secreto</titulo><autor>Rosa Flores</autor><categoria>Programacion</categoria></libro>
+    <libro><ISBN>1701287278</ISBN><titulo>Geometria: Compendio Silencioso</titulo><autor>Carlos Ramirez</autor><categoria>Ecologia</categoria></libro>
+    <libro><ISBN>1667150440</ISBN><titulo>El General Atlas</titulo><autor>Teresa Rodriguez</autor><categoria>Arquitectura</categoria></libro>
+    <libro><ISBN>1815353403</ISBN><titulo>La Practico Manual</titulo><autor>Mario Diaz</autor><categoria>Programacion</categoria></libro>
+    <libro><ISBN>1978229812</ISBN><titulo>El Aplicado Cronica</titulo><autor>Gabriela Rodriguez</autor><categoria>Estadistica</categoria></libro>
+    <libro><ISBN>1527583229</ISBN><titulo>El Fundamental Jardin</titulo><autor>Pablo Ortiz</autor><categoria>Arquitectura</categoria></libro>
+    <libro><ISBN>504787412</ISBN><titulo>El Elemental Sombra</titulo><autor>Gabriela Aguilar</autor><categoria>Ecologia</categoria></libro>
+    <libro><ISBN>489125764</ISBN><titulo>Jardin de Ecologia</titulo><autor>Teresa Diaz</autor><categoria>Arquitectura</categoria></libro>
+    <libro><ISBN>1331089431</ISBN><titulo>La Perdido Memoria</titulo><autor>Andres Campos</autor><categoria>Programacion</categoria></libro>
+    <libro><ISBN>614261146</ISBN><titulo>Fisica: Legado Definitivo</titulo><autor>Roberto Ibarra</autor><categoria>Ecologia</categoria></libro>
+    <libro><ISBN>285632266</ISBN><titulo>El Infinito Origen</titulo><autor>Tomas Flores</autor><categoria>Estadistica</categoria></libro>
+    <libro><ISBN>272422319</ISBN><titulo>El Tratado Elemental de Biologia</titulo><autor>Diego Ibarra</autor><categoria>Arquitectura</categoria></libro>
+    <libro><ISBN>161928081</ISBN><titulo>Cronicas de Biografia</titulo><autor>Elena Cabrera</autor><categoria>Programacion</categoria></libro>
+    <libro><ISBN>1050973776</ISBN><titulo>El Avanzado Sombra</titulo><autor>Valeria Pena</autor><categoria>Ecologia</categoria></libro>
+    <libro><ISBN>703845332</ISBN><titulo>Introduccion a Literatura</titulo><autor>Pablo Ramirez</autor><categoria>Programacion</categoria></libro>
+    <libro><ISBN>468798162</ISBN><titulo>Sombra de Comic</titulo><autor>Roberto Ramirez</autor><categoria>Ecologia</categoria></libro>
+    <libro><ISBN>742424958</ISBN><titulo>El Puente Moderno de Ciencias</titulo><autor>Valeria Rojas</autor><categoria>Programacion</categoria></libro>
+    <libro><ISBN>1096217920</ISBN><titulo>Introduccion a Medicina</titulo><autor>Andres Flores</autor><categoria>Arquitectura</categoria></libro>
+    <libro><ISBN>347985846</ISBN><titulo>Compendio del Literatura</titulo><autor>Ana Perez</autor><categoria>Arquitectura</categoria></libro>
+    <libro><ISBN>1649732298</ISBN><titulo>El Clasico Viaje</titulo><autor>Isabel Rodriguez</autor><categoria>Programacion</categoria></libro>
+    <libro><ISBN>373963739</ISBN><titulo>La Esencial Manual</titulo><autor>Felipe Salazar</autor><categoria>Arquitectura</categoria></libro>
+    <libro><ISBN>178680581</ISBN><titulo>Introduccion a Educacion</titulo><autor>Tomas Garcia</autor><categoria>Ecologia</categoria></libro>
+    <libro><ISBN>1593095499</ISBN><titulo>La Fundamental Metodo</titulo><autor>Sofia Campos</autor><categoria>Programacion</categoria></libro>
+    <libro><ISBN>11994441</ISBN><titulo>Cronicas de Ciencias</titulo><autor>Clara Ramirez</autor><categoria>Estadistica</categoria></libro>
+    <libro><ISBN>1262255658</ISBN><titulo>Introduccion a Deportes</titulo><autor>Ivan Vargas</autor><categoria>Arquitectura</categoria></libro>
+    <libro><ISBN>1870869633</ISBN><titulo>Introduccion a Ensayo</titulo><autor>Sofia Rodriguez</autor><categoria>Arquitectura</categoria></libro>
+    <libro><ISBN>1200382817</ISBN><titulo>El Moderno Diccionario</titulo><autor>Oscar Aguilar</autor><categoria>Ecologia</categoria></libro>
+    <libro><ISBN>1883936807</ISBN><titulo>Ciencias: Rio Infinito</titulo><autor>Camila Lopez</autor><categoria>Programacion</categoria></libro>
+    <libro><ISBN>873615686</ISBN><titulo>El Moderno Rio</titulo><autor>Mario Campos</autor><categoria>Arquitectura</categoria></libro>
+    <libro><ISBN>1347027675</ISBN><titulo>Sombra del Zoologia</titulo><autor>Jorge Flores</autor><categoria>Estadistica</categoria></libro>
+    <libro><ISBN>900110569</ISBN><titulo>El Espejo Completo de Historia</titulo><autor>Luis Pena</autor><categoria>Programacion</categoria></libro>
+    <libro><ISBN>1721023883</ISBN><titulo>Metodo del Botanica</titulo><autor>Nadia Rodriguez</autor><categoria>Arquitectura</categoria></libro>
+    <libro><ISBN>1216830813</ISBN><titulo>Derecho: Memoria Oculto</titulo><autor>Ruben Morales</autor><categoria>Ecologia</categoria></libro>
+    <libro><ISBN>1912897380</ISBN><titulo>Historia de Educacion</titulo><autor>Sofia Reyes</autor><categoria>Arquitectura</categoria></libro>
+    <libro><ISBN>1393003123</ISBN><titulo>El Origen Nocturno de Algebra</titulo><autor>Hector Fuentes</autor><categoria>Ecologia</categoria></libro>
+    <libro><ISBN>1547321763</ISBN><titulo>Economia: Compendio Comparado</titulo><autor>Roberto Cabrera</autor><categoria>Programacion</categoria></libro>
+    <libro><ISBN>903047174</ISBN><titulo>Cronicas de Novelas</titulo><autor>Elena Reyes</autor><categoria>Programacion</categoria></libro>
+    <libro><ISBN>641396092</ISBN><titulo>El Compendio Elemental de Estadistica</titulo><autor>Paula Lopez</autor><categoria>Arquitectura</categoria></libro>
+    <libro><ISBN>1777803572</ISBN><titulo>El Moderno Atlas</titulo><autor>Andres Reyes</autor><categoria>Ecologia</categoria></libro>
+    <libro><ISBN>1053154989</ISBN><titulo>El Completo Codigo</titulo><autor>Paula Flores</autor><categoria>Arquitectura</categoria></libro>
+    <libro><ISBN>1865150277</ISBN><titulo>Introduccion a Biografia</titulo><autor>Clara Perez</autor><categoria>Estadistica</categoria></libro>
+    <libro><ISBN>1779309004</ISBN><titulo>Historia: Puente Clasico</titulo><autor>Ivan Flores</autor><categoria>Programacion</categoria></libro>
+    <libro><ISBN>1783672621</ISBN><titulo>Medicina: Diccionario Completo</titulo><autor>Felipe Castro</autor><categoria>Estadistica</categoria></libro>
+    <libro><ISBN>82053016</ISBN><titulo>Introduccion a Fisica</titulo><autor>Sofia Cabrera</autor><categoria>Arquitectura</categoria></libro>
+    <libro><ISBN>1423785921</ISBN><titulo>Atlas de Derecho</titulo><autor>Teresa Mendez</autor><categoria>Estadistica</categoria></libro>
+    <libro><ISBN>1010864328</ISBN><titulo>Compendio del Bases de datos</titulo><autor>Ivan Gomez</autor><categoria>Arquitectura</categoria></libro>
+    <libro><ISBN>1260794518</ISBN><titulo>Cronicas de Cuento</titulo><autor>Paula Ibarra</autor><categoria>Estadistica</categoria></libro>
+    <libro><ISBN>160150816</ISBN><titulo>El Origen Ilustrado de Cine</titulo><autor>Ivan Rodriguez</autor><categoria>Programacion</categoria></libro>
+    <libro><ISBN>1558956145</ISBN><titulo>La Silencioso Secreto</titulo><autor>Camila Diaz</autor><categoria>Ecologia</categoria></libro>
+    <libro><ISBN>1710986816</ISBN><titulo>Atlas de Ciencias</titulo><autor>Nadia Aguilar</autor><categoria>Estadistica</categoria></libro>
+    <libro><ISBN>91243235</ISBN><titulo>Origen de Deportes</titulo><autor>Teresa Ortiz</autor><categoria>Programacion</categoria></libro>
+    <libro><ISBN>276519027</ISBN><titulo>Cronicas de Teatro</titulo><autor>Felipe Campos</autor><categoria>Estadistica</categoria></libro>
+    <libro><ISBN>1577511999</ISBN><titulo>Arte: Diccionario Perdido</titulo><autor>Ivan Aguilar</autor><categoria>Estadistica</categoria></libro>
+    <libro><ISBN>1310411734</ISBN><titulo>La General Cronica</titulo><autor>Clara Rojas</autor><categoria>Arquitectura</categoria></libro>
+    <libro><ISBN>1648666985</ISBN><titulo>Introduccion a Arte</titulo><autor>Ruben Cabrera</autor><categoria>Arquitectura</categoria></libro>
+    <libro><ISBN>232140126</ISBN><titulo>Musica: Sistema Avanzado</titulo><autor>Valeria Mendez</autor><categoria>Arquitectura</categoria></libro>
+    <libro><ISBN>95954481</ISBN><titulo>Cronicas de Ingenieria</titulo><autor>Mario Fuentes</autor><categoria>Arquitectura</categoria></libro>
+    <libro><ISBN>1338082247</ISBN><titulo>El Oculto Memoria</titulo><autor>Jorge Diaz</autor><categoria>Ecologia</categoria></libro>
+    <libro><ISBN>157158971</ISBN><titulo>Ciencias: Secreto Comparado</titulo><autor>Rosa Ortiz</autor><categoria>Estadistica</categoria></libro>
+    <libro><ISBN>1003025773</ISBN><titulo>Jardin de Biografia</titulo><autor>Jorge Lopez</autor><categoria>Estadistica</categoria></libro>
+    <libro><ISBN>1110841094</ISBN><titulo>Psicologia: Sistema Elemental</titulo><autor>Ivan Lopez</autor><categoria>Ecologia</categoria></libro>
+    <libro><ISBN>1880845993</ISBN><titulo>Diccionario del Viajes</titulo><autor>Jorge Rojas</autor><categoria>Arquitectura</categoria></libro>
+    <libro><ISBN>1919801989</ISBN><titulo>El Teoria Breve de Genetica</titulo><autor>Elena Castro</autor><categoria>Estadistica</categoria></libro>
+    <libro><ISBN>1080072427</ISBN><titulo>Matematicas: Camino Moderno</titulo><autor>Mario Cruz</autor><categoria>Arquitectura</categoria></libro>
+    <libro><ISBN>1651461434</ISBN><titulo>El Fundamental Memoria</titulo><autor>Nadia Flores</autor><categoria>Estadistica</categoria></libro>
+    <libro><ISBN>443652592</ISBN><titulo>El Breve Codigo</titulo><autor>Gabriela Campos</autor><categoria>Arquitectura</categoria></libro>
+    <libro><ISBN>1730328250</ISBN><titulo>Cronica de Biografia</titulo><autor>Gabriela Vargas</autor><categoria>Estadistica</categoria></libro>
+    <libro><ISBN>281237222</ISBN><titulo>El Aplicado Manual</titulo><autor>Teresa Mendez</autor><categoria>Ecologia</categoria></libro>
+    <libro><ISBN>693170870</ISBN><titulo>Espejo del Cocina</titulo><autor>Jorge Morales</autor><categoria>Estadistica</categoria></libro>
+    <libro><ISBN>411988822</ISBN><titulo>Ensayo: Diccionario Elemental</titulo><autor>Tomas Rodriguez</autor><categoria>Ecologia</categoria></libro>
+    <libro><ISBN>1673504902</ISBN><titulo>Introduccion a Literatura</titulo><autor>Isabel Cabrera</autor><categoria>Ecologia</categoria></libro>
+    <libro><ISBN>1733325340</ISBN><titulo>Cronicas de Biologia</titulo><autor>Felipe Flores</autor><categoria>Ecologia</categoria></libro>
+    <libro><ISBN>1215540910</ISBN><titulo>Sistema de Antropologia</titulo><autor>Jorge Martinez</autor><categoria>Arquitectura</categoria></libro>
+    <libro><ISBN>1047126152</ISBN><titulo>Cronica del Programacion</titulo><autor>Isabel Castro</autor><categoria>Ecologia</categoria></libro>
+    <libro><ISBN>972179900</ISBN><titulo>El Comparado Sombra</titulo><autor>Rosa Morales</autor><categoria>Arquitectura</categoria></libro>
+    <libro><ISBN>1754095565</ISBN><titulo>Poesia: Mapa General</titulo><autor>Ana Salazar</autor><categoria>Arquitectura</categoria></libro>
+    <libro><ISBN>1444884787</ISBN><titulo>El Metodo Definitivo de Psicologia</titulo><autor>Elena Gomez</autor><categoria>Ecologia</categoria></libro>
+    <libro><ISBN>852071689</ISBN><titulo>Cronicas de Arte</titulo><autor>Andres Gomez</autor><categoria>Ecologia</categoria></libro>
+    <libro><ISBN>47067969</ISBN><titulo>Camino del Psicologia</titulo><autor>Sofia Perez</autor><categoria>Arquitectura</categoria></libro>
+    <libro><ISBN>1452466196</ISBN><titulo>Introduccion a Cuento</titulo><autor>Mario Perez</autor><categoria>Ecologia</categoria></libro>
+    <libro><ISBN>699865136</ISBN><titulo>El Secreto Ilustrado de Sociologia</titulo><autor>Andres Aguilar</autor><categoria>Estadistica</categoria></libro>
+    <libro><ISBN>483830006</ISBN><titulo>Introduccion a Comic</titulo><autor>Felipe Ibarra</autor><categoria>Programacion</categoria></libro>
+    <libro><ISBN>1028448958</ISBN><titulo>Origen del Filosofia</titulo><autor>Felipe Fuentes</autor><categoria>Ecologia</categoria></libro>
+  </listaLibros>
+</config>

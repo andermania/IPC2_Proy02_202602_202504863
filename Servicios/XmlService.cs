@@ -89,60 +89,110 @@ namespace GestiónDeBiblioteca.Servicios
         /// <summary>
         /// Procesa el elemento listaCategorias del XML.
         /// El atributo "padre" es opcional (categoría raíz si se omite).
-        /// Soporta padres anidados: el padre se resuelve por ruta o por nombre global.
+        /// Soporta orden arbitrario (linking diferido): un hijo puede aparecer
+        /// antes que su padre; se resuelve por pasadas iterativas.
+        /// Unicidad global por nombre: duplicados intra-archivo se reportan,
+        /// reutilización entre archivos (carga incremental) se acepta en silencio.
+        /// Si el padre nunca aparece, la categoría se rechaza (no se crean fantasmas).
         /// </summary>
         private int ProcesarCategorias(XElement elemCategorias, ListaSimpleCadenas errores)
         {
             int creadas = 0;
 
-            // Primera pasada: categorías raíz (sin padre)
-            foreach (XElement elem in elemCategorias.Elements("categoria"))
+            // Materializar a arreglos nativos (sin LINQ/List)
+            int n = 0;
+            foreach (XElement e in elemCategorias.Elements("categoria"))
             {
-                string? padre = elem.Attribute("padre")?.Value;
-                string nombre = elem.Value.Trim();
+                n++;
+            }
 
+            if (n == 0)
+            {
+                return 0;
+            }
+
+            XElement[] elems = new XElement[n];
+            int idx = 0;
+            foreach (XElement e in elemCategorias.Elements("categoria"))
+            {
+                elems[idx] = e;
+                idx++;
+            }
+
+            string[] nombres = new string[n];
+            string[] padres = new string[n];
+            bool[] omitir = new bool[n];
+
+            for (int i = 0; i < n; i++)
+            {
+                string nombre = elems[i].Value.Trim();
+                string padre = elems[i].Attribute("padre")?.Value?.Trim() ?? "";
+                nombres[i] = nombre;
+                padres[i] = padre;
                 if (string.IsNullOrEmpty(nombre))
+                {
+                    omitir[i] = true;
+                }
+            }
+
+            // Duplicados dentro del mismo archivo (insensible a mayúsculas)
+            for (int i = 0; i < n; i++)
+            {
+                if (omitir[i])
                 {
                     continue;
                 }
 
-                if (padre == null || string.IsNullOrEmpty(padre.Trim()))
+                for (int j = 0; j < i; j++)
                 {
-                    // Categoría raíz
-                    catalogo.AgregarCategoria(nombre);
-                    creadas++;
+                    if (string.Equals(nombres[j], nombres[i], StringComparison.OrdinalIgnoreCase))
+                    {
+                        errores.Agregar($"Categoría '{nombres[i]}' duplicada en el archivo, se omite.");
+                        omitir[i] = true;
+                        break;
+                    }
                 }
             }
 
-            // Segunda pasada: categorías con padre (resolución por ruta o nombre global)
+            // Primera pasada: raíces (sin padre) — orden independiente
+            for (int i = 0; i < n; i++)
+            {
+                if (omitir[i] || !string.IsNullOrEmpty(padres[i]))
+                {
+                    continue;
+                }
+
+                if (catalogo.BuscarCategoriaPorNombre(nombres[i]) == null)
+                {
+                    catalogo.AgregarCategoria(nombres[i]);
+                    creadas++;
+                }
+                // Si ya existía de una carga previa, se reutiliza en silencio.
+            }
+
+            // Pasadas iterativas: hijos cuyo padre ya existe (cadenas profundas)
             bool hayCambios = true;
             int iteraciones = 0;
-            int totalElementos = elemCategorias.Elements("categoria").Count();
 
-            while (hayCambios && iteraciones < totalElementos)
+            while (hayCambios && iteraciones < n + 1)
             {
                 hayCambios = false;
                 iteraciones++;
 
-                foreach (XElement elem in elemCategorias.Elements("categoria"))
+                for (int i = 0; i < n; i++)
                 {
-                    string? padre = elem.Attribute("padre")?.Value;
-                    string nombre = elem.Value.Trim();
-
-                    if (string.IsNullOrEmpty(nombre) || padre == null || string.IsNullOrEmpty(padre.Trim()))
+                    if (omitir[i] || string.IsNullOrEmpty(padres[i]))
                     {
                         continue;
                     }
 
-                    string nombrePadre = padre.Trim();
-
-                    // Unicidad global: si el nombre ya existe, no se crea de nuevo
-                    if (catalogo.BuscarCategoriaPorNombre(nombre) != null)
+                    // Ya existe (creada en este archivo o en carga previa): no contar de nuevo
+                    if (catalogo.BuscarCategoriaPorNombre(nombres[i]) != null)
                     {
                         continue;
                     }
 
-                    // Verificar si el padre ya existe (por ruta o por nombre global)
+                    string nombrePadre = padres[i];
                     Categoria? padreExistente = catalogo.BuscarCategoria(nombrePadre);
 
                     if (padreExistente == null)
@@ -152,9 +202,7 @@ namespace GestiónDeBiblioteca.Servicios
 
                     if (padreExistente != null)
                     {
-                        // Resolver la ruta real del padre para mantener jerarquía correcta
                         string rutaPadreReal = padreExistente.ObtenerRutaCompleta();
-                        // Quitar prefijo "Biblioteca > " si existe (ruta interna usa ese prefijo)
                         const string prefijoRaiz = "Biblioteca > ";
                         if (rutaPadreReal.StartsWith(prefijoRaiz))
                         {
@@ -165,27 +213,28 @@ namespace GestiónDeBiblioteca.Servicios
                             rutaPadreReal = nombrePadre;
                         }
 
-                        catalogo.AgregarSubcategoria(rutaPadreReal, nombre);
-                        creadas++;
-                        hayCambios = true;
+                        Categoria? creadaCat = catalogo.AgregarSubcategoria(rutaPadreReal, nombres[i]);
+
+                        if (creadaCat != null)
+                        {
+                            creadas++;
+                            hayCambios = true;
+                        }
                     }
                 }
             }
 
-            // Reportar categorías cuyo padre nunca se encontró
-            foreach (XElement elem in elemCategorias.Elements("categoria"))
+            // Huérfanas: padre nunca declarado -> rechazo explícito
+            for (int i = 0; i < n; i++)
             {
-                string? padre = elem.Attribute("padre")?.Value;
-                string nombre = elem.Value.Trim();
-
-                if (string.IsNullOrEmpty(nombre) || padre == null || string.IsNullOrEmpty(padre.Trim()))
+                if (omitir[i] || string.IsNullOrEmpty(padres[i]))
                 {
                     continue;
                 }
 
-                if (catalogo.BuscarCategoriaPorNombre(nombre) == null)
+                if (catalogo.BuscarCategoriaPorNombre(nombres[i]) == null)
                 {
-                    errores.Agregar($"Categoría '{nombre}': padre '{padre.Trim()}' no encontrado.");
+                    errores.Agregar($"Categoría '{nombres[i]}': padre '{padres[i]}' no encontrado, se rechaza.");
                 }
             }
 
@@ -194,7 +243,8 @@ namespace GestiónDeBiblioteca.Servicios
 
         /// <summary>
         /// Procesa el elemento listaLibros del XML.
-        /// Cada libro debe tener ISBN, título, autor y categoría.
+        /// Cada libro debe tener ISBN (int válido, no duplicado), título,
+        /// autor y categoría existente (no se crean categorías fantasmas).
         /// </summary>
         private void ProcesarLibros(XElement elemLibros, ResultadoCarga resultado)
         {
@@ -210,30 +260,53 @@ namespace GestiónDeBiblioteca.Servicios
                     // Validaciones
                     if (string.IsNullOrEmpty(strISBN) || !int.TryParse(strISBN, out int isbn))
                     {
-                        resultado.Errores.Agregar($"ISBN inválido en libro: '{strISBN}'");
+                        resultado.Errores.Agregar($"ISBN inválido en libro: '{strISBN}', se rechaza.");
                         continue;
                     }
 
                     if (string.IsNullOrEmpty(titulo))
                     {
-                        resultado.Errores.Agregar($"Libro ISBN {isbn}: título vacío");
+                        resultado.Errores.Agregar($"Libro ISBN {isbn}: título vacío, se rechaza.");
                         continue;
                     }
 
                     if (string.IsNullOrEmpty(autor))
                     {
-                        resultado.Errores.Agregar($"Libro ISBN {isbn}: autor vacío");
+                        resultado.Errores.Agregar($"Libro ISBN {isbn}: autor vacío, se rechaza.");
                         continue;
                     }
 
                     if (string.IsNullOrEmpty(categoria))
                     {
-                        resultado.Errores.Agregar($"Libro ISBN {isbn}: categoría vacía");
+                        resultado.Errores.Agregar($"Libro ISBN {isbn}: categoría vacía, se rechaza.");
                         continue;
                     }
 
-                    // Crear el libro
-                    Libro libro = new Libro(isbn, titulo, autor, categoria);
+                    // La categoría debe existir (padres + subcategorías ya cargadas)
+                    Categoria? catExistente = catalogo.BuscarCategoria(categoria);
+
+                    if (catExistente == null)
+                    {
+                        catExistente = catalogo.BuscarCategoriaPorNombre(categoria);
+                    }
+
+                    if (catExistente == null)
+                    {
+                        resultado.Errores.Agregar($"Libro ISBN {isbn}: categoría '{categoria}' no existe, se rechaza.");
+                        continue;
+                    }
+
+                    // ISBN duplicado (en este archivo o en cargas previas)
+                    if (catalogo.BuscarPorISBN(isbn) != null)
+                    {
+                        resultado.LibrosDuplicados++;
+                        resultado.Errores.Agregar($"Libro ISBN {isbn} duplicado, se omite.");
+                        continue;
+                    }
+
+                    // Crear el libro con la ruta real para jerarquía profunda
+                    string rutaCategoriaReal = catExistente.ObtenerRutaCompleta();
+                    Libro libro = new Libro(isbn, titulo, autor, rutaCategoriaReal);
 
                     // Intentar registrar
                     bool registrado = catalogo.RegistrarLibro(libro);
@@ -245,6 +318,7 @@ namespace GestiónDeBiblioteca.Servicios
                     else
                     {
                         resultado.LibrosDuplicados++;
+                        resultado.Errores.Agregar($"Libro ISBN {isbn} no se pudo registrar, se omite.");
                     }
                 }
                 catch (Exception ex)

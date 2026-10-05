@@ -64,7 +64,45 @@ namespace GestiónDeBiblioteca.Servicios
         }
 
         /// <summary>
-        /// Genera el código DOT de los libros de una categoría específica.
+        /// Genera el código DOT del subárbol de categorías desde una ruta específica.
+        /// Cubre el requisito de visualizar desde una subcategoría determinada.
+        /// </summary>
+        public string GenerarDotCategoriasDesde(string ruta)
+        {
+            Categoria? desde = catalogo.BuscarCategoria(ruta);
+
+            if (desde == null)
+            {
+                desde = catalogo.BuscarCategoriaPorNombre(ruta);
+            }
+
+            if (desde == null)
+            {
+                return GenerarDotError("Categoría no encontrada: " + ruta);
+            }
+
+            StringBuilder sub = new StringBuilder();
+            sub.AppendLine("digraph CategoriasDesde {");
+            sub.AppendLine("  rankdir=TB;");
+            sub.AppendLine("  node [shape=box, style=filled, fillcolor=\"#E3F2FD\", fontname=\"Arial\"];");
+            sub.AppendLine("  edge [color=\"#666666\"];");
+            sub.AppendLine($"  label=\"Estructura desde {EscaparEtiquetaDot(desde.Nombre)}\";");
+            sub.AppendLine("  fontsize=20;");
+            sub.AppendLine("  labelloc=t;");
+
+            string idDesde = EscaparEtiquetaDot(desde.ObtenerRutaCompleta());
+            sub.AppendLine($"  \"{idDesde}\" [label=\"{EscaparEtiquetaDot(desde.Nombre)}\\n({desde.Libros.ObtenerCantidad()} libros)\", fillcolor=\"#1565C0\", fontcolor=white];");
+
+            GenerarDotCategoriasRecursivo(desde, sub);
+
+            sub.AppendLine("}");
+
+            return sub.ToString();
+        }
+
+        /// <summary>
+        /// Genera el código DOT de los libros de una categoría específica,
+        /// en orden ascendente por ISBN (recorrido inorden del AVL de la categoría).
         /// </summary>
         public string GenerarDotLibrosCategoria(string rutaCategoria)
         {
@@ -119,7 +157,17 @@ namespace GestiónDeBiblioteca.Servicios
 
         /// <summary>
         /// Genera el código DOT del árbol AVL de ISBN.
+        /// Por rendimiento del navegador (viz.js), solo dibuja los niveles
+        /// superiores cuando el árbol es grande (ver MaxNivelesDiagrama).
         /// </summary>
+        // Niveles máximos dibujados en diagramas AVL (0 = raíz).
+        /// 7 niveles = hasta 255 nodos: viz.js lo renderiza sin colgarse
+        /// incluso con catálogos de 10 000 libros.
+        /// </summary>
+        private const int MaxNivelesDiagrama = 7;
+
+        private const int MaxNodosDiagrama = (1 << (MaxNivelesDiagrama + 1)) - 1; // 255
+
         public string GenerarDotArbolISBN()
         {
             ArbolLibrosISBN arbol = catalogo.ObtenerArbolISBN();
@@ -129,12 +177,16 @@ namespace GestiónDeBiblioteca.Servicios
                 return GenerarDotInfo("El árbol de ISBN está vacío.");
             }
 
+            string sufijo = arbol.ObtenerCantidad() > MaxNodosDiagrama
+                ? $" ({arbol.ObtenerCantidad()} libros; se muestran los {MaxNivelesDiagrama + 1} niveles superiores)"
+                : $" ({arbol.ObtenerCantidad()} libros)";
+
             StringBuilder dot = new StringBuilder();
             dot.AppendLine("digraph AVL_ISBN {");
             dot.AppendLine("  rankdir=TB;");
             dot.AppendLine("  node [shape=circle, style=filled, fontname=\"Arial\"];");
             dot.AppendLine("  edge [arrowsize=0.7];");
-            dot.AppendLine("  label=\"Árbol AVL - ISBN\";");
+            dot.AppendLine($"  label=\"Arbol AVL - ISBN{sufijo}\";");
             dot.AppendLine("  fontsize=18;");
             dot.AppendLine("  labelloc=t;");
 
@@ -142,7 +194,7 @@ namespace GestiónDeBiblioteca.Servicios
 
             if (raiz != null)
             {
-                GenerarDotAvlISBNRecursivo(raiz, dot);
+                GenerarDotAvlISBNRecursivo(raiz, dot, 0);
             }
 
             dot.AppendLine("}");
@@ -150,7 +202,7 @@ namespace GestiónDeBiblioteca.Servicios
             return dot.ToString();
         }
 
-        private void GenerarDotAvlISBNRecursivo(NodoISBN nodo, StringBuilder dot)
+        private void GenerarDotAvlISBNRecursivo(NodoISBN nodo, StringBuilder dot, int nivel)
         {
             string nodoId = $"n{nodo.Libro.ISBN}";
 
@@ -166,16 +218,95 @@ namespace GestiónDeBiblioteca.Servicios
             string label = $"{nodo.Libro.ISBN}\\n{EscaparEtiquetaDot(tituloCorto)}";
             dot.AppendLine($"  \"{nodoId}\" [label=\"{label}\", fillcolor=\"{color}\"];");
 
+            if (nivel >= MaxNivelesDiagrama)
+            {
+                return;
+            }
+
             if (nodo.Izquierda != null)
             {
                 dot.AppendLine($"  \"{nodoId}\" -> \"n{nodo.Izquierda.Libro.ISBN}\";");
-                GenerarDotAvlISBNRecursivo(nodo.Izquierda, dot);
+                GenerarDotAvlISBNRecursivo(nodo.Izquierda, dot, nivel + 1);
             }
 
             if (nodo.Derecha != null)
             {
                 dot.AppendLine($"  \"{nodoId}\" -> \"n{nodo.Derecha.Libro.ISBN}\";");
-                GenerarDotAvlISBNRecursivo(nodo.Derecha, dot);
+                GenerarDotAvlISBNRecursivo(nodo.Derecha, dot, nivel + 1);
+            }
+        }
+
+        /// <summary>
+        /// Genera el código DOT del árbol AVL alfabético (por Título).
+        /// Misma estructura y rotaciones que el AVL de ISBN, pero ordenado
+        /// con comparación insensible a mayúsculas (ver ArbolLibrosTitulo).
+        /// También limitado a los niveles superiores por rendimiento.
+        /// </summary>
+        public string GenerarDotArbolTitulo()
+        {
+            ArbolLibrosTitulo arbol = catalogo.ObtenerArbolTitulo();
+
+            if (arbol.ObtenerCantidad() == 0)
+            {
+                return GenerarDotInfo("El árbol alfabético está vacío.");
+            }
+
+            string sufijo = arbol.ObtenerCantidad() > MaxNodosDiagrama
+                ? $" ({arbol.ObtenerCantidad()} libros; se muestran los {MaxNivelesDiagrama + 1} niveles superiores)"
+                : $" ({arbol.ObtenerCantidad()} libros)";
+
+            StringBuilder dot = new StringBuilder();
+            dot.AppendLine("digraph AVL_Titulo {");
+            dot.AppendLine("  rankdir=TB;");
+            dot.AppendLine("  node [shape=box, style=\"rounded,filled\", fontname=\"Arial\"];");
+            dot.AppendLine("  edge [arrowsize=0.7];");
+            dot.AppendLine($"  label=\"Arbol AVL - Titulo (orden alfabetico){sufijo}\";");
+            dot.AppendLine("  fontsize=18;");
+            dot.AppendLine("  labelloc=t;");
+
+            NodoTitulo? raiz = arbol.ObtenerRaiz();
+
+            if (raiz != null)
+            {
+                GenerarDotAvlTituloRecursivo(raiz, dot, 0);
+            }
+
+            dot.AppendLine("}");
+
+            return dot.ToString();
+        }
+
+        private void GenerarDotAvlTituloRecursivo(NodoTitulo nodo, StringBuilder dot, int nivel)
+        {
+            string nodoId = $"t{nodo.Libro.ISBN}";
+
+            int alturaIzq = nodo.Izquierda?.Altura ?? 0;
+            int alturaDer = nodo.Derecha?.Altura ?? 0;
+            int equilibrio = alturaIzq - alturaDer;
+
+            string color = (equilibrio > 1 || equilibrio < -1)
+                ? "#EF9A9A"   // Rojo si desbalanceado
+                : "#FFE0B2"; // Naranja claro si equilibrado (difiere del ISBN)
+
+            string tituloCorto = nodo.Libro.Titulo.Substring(0, Math.Min(18, nodo.Libro.Titulo.Length));
+            string label = $"{EscaparEtiquetaDot(tituloCorto)}\\n[{nodo.Libro.ISBN}]";
+            dot.AppendLine($"  \"{nodoId}\" [label=\"{label}\", fillcolor=\"{color}\"];");
+
+            if (nivel >= MaxNivelesDiagrama)
+            {
+                return;
+            }
+
+            if (nodo.Izquierda != null)
+            {
+                dot.AppendLine($"  \"{nodoId}\" -> \"t{nodo.Izquierda.Libro.ISBN}\";");
+                GenerarDotAvlTituloRecursivo(nodo.Izquierda, dot, nivel + 1);
+            }
+
+            if (nodo.Derecha != null)
+            {
+                dot.AppendLine($"  \"{nodoId}\" -> \"t{nodo.Derecha.Libro.ISBN}\";");
+                GenerarDotAvlTituloRecursivo(nodo.Derecha, dot, nivel + 1);
             }
         }
 

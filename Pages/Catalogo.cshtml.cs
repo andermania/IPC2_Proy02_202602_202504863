@@ -35,8 +35,8 @@ namespace GestiónDeBiblioteca.Pages
         public int TotalCategorías { get; set; }
         public int TotalLibros { get; set; }
 
-        public SelectList OpcionesCategorias { get; set; } = new SelectList(Array.Empty<SelectListItem>());
-        public SelectList OpcionesTodasCategorias { get; set; } = new SelectList(Array.Empty<SelectListItem>());
+        public SelectList OpcionesCategorias { get; set; } = new SelectList(new SelectListItem[0]);
+        public SelectList OpcionesTodasCategorias { get; set; } = new SelectList(new SelectListItem[0]);
 
         public CatalogoModel(CatalogoController catalogo)
         {
@@ -82,18 +82,48 @@ namespace GestiónDeBiblioteca.Pages
                 return Page();
             }
 
-            string rutaCompleta = CategoriaPadre.Trim() + " > " + NuevaSubcategoria.Trim();
+            string padre = CategoriaPadre.Trim();
+            string hija = NuevaSubcategoria.Trim();
+
+            string rutaCompleta = padre + " > " + hija;
             Categoria? existente = catalogo.BuscarCategoria(rutaCompleta);
+
+            if (existente == null)
+            {
+                existente = catalogo.BuscarCategoriaPorNombre(hija);
+            }
 
             if (existente != null)
             {
-                MensajeError = $"La subcategoría \"{rutaCompleta}\" ya existe.";
+                MensajeError = $"La subcategoría \"{hija}\" ya existe.";
                 CargarDatos();
                 return Page();
             }
 
-            catalogo.AgregarSubcategoria(CategoriaPadre.Trim(), NuevaSubcategoria.Trim());
-            MensajeExito = $"Subcategoría \"{NuevaSubcategoria.Trim()}\" creada bajo \"{CategoriaPadre.Trim()}\".";
+            Categoria? padreExiste = catalogo.BuscarCategoria(padre);
+
+            if (padreExiste == null)
+            {
+                padreExiste = catalogo.BuscarCategoriaPorNombre(padre);
+            }
+
+            if (padreExiste == null)
+            {
+                MensajeError = $"El padre \"{padre}\" no existe.";
+                CargarDatos();
+                return Page();
+            }
+
+            Categoria? creada = catalogo.AgregarSubcategoria(padreExiste.ObtenerRutaCompleta(), hija);
+
+            if (creada == null)
+            {
+                MensajeError = $"No se pudo crear la subcategoría bajo \"{padre}\".";
+                CargarDatos();
+                return Page();
+            }
+
+            MensajeExito = $"Subcategoría \"{hija}\" creada bajo \"{padreExiste.ObtenerRutaCompleta()}\".";
             CargarDatos();
             return Page();
         }
@@ -137,16 +167,17 @@ namespace GestiónDeBiblioteca.Pages
 
             for (int i = 0; i < todasLasCategorias.Length; i++)
             {
+                string ruta = todasLasCategorias[i].ObtenerRutaCompleta();
                 opcionesCategorias[i] = new SelectListItem
                 {
-                    Value = todasLasCategorias[i].Nombre,
-                    Text = todasLasCategorias[i].ObtenerRutaCompleta()
+                    Value = ruta,
+                    Text = ruta
                 };
 
                 opcionesTodas[i] = new SelectListItem
                 {
-                    Value = todasLasCategorias[i].ObtenerRutaCompleta(),
-                    Text = todasLasCategorias[i].ObtenerRutaCompleta()
+                    Value = ruta,
+                    Text = ruta
                         + $" ({todasLasCategorias[i].Libros.ObtenerCantidad()} libros)"
                 };
             }

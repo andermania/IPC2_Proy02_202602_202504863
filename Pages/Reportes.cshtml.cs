@@ -19,10 +19,16 @@ namespace GestiónDeBiblioteca.Pages
         [BindProperty]
         public string CategoriaSeleccionada { get; set; } = "";
 
-        public string? DotCategorias { get; set; }
-        public string? DotLibrosCategoria { get; set; }
+        [BindProperty]
+        public string CategoriaArbolSeleccionada { get; set; } = "";
 
-        public SelectList OpcionesCategorias { get; set; } = new SelectList(Array.Empty<SelectListItem>());
+        public string? DotArbolISBN { get; set; }
+        public string? DotArbolTitulo { get; set; }
+        public string? DotLibrosCategoria { get; set; }
+        public string? DotCategorias { get; set; }
+
+        public SelectList OpcionesCategorias { get; set; } = new SelectList(new SelectListItem[0]);
+        public SelectList OpcionesTodasCategorias { get; set; } = new SelectList(new SelectListItem[0]);
 
         public ReportesModel(CatalogoController catalogo)
         {
@@ -38,7 +44,14 @@ namespace GestiónDeBiblioteca.Pages
         public IActionResult OnPostArbolISBN()
         {
             CargarComboCategorias();
-            DotCategorias = graphvizService.GenerarDotArbolISBN();
+            DotArbolISBN = graphvizService.GenerarDotArbolISBN();
+            return Page();
+        }
+
+        public IActionResult OnPostArbolTitulo()
+        {
+            CargarComboCategorias();
+            DotArbolTitulo = graphvizService.GenerarDotArbolTitulo();
             return Page();
         }
 
@@ -46,6 +59,22 @@ namespace GestiónDeBiblioteca.Pages
         {
             CargarComboCategorias();
             DotCategorias = graphvizService.GenerarDotCategorias();
+            return Page();
+        }
+
+        public IActionResult OnPostEstructuraDesde()
+        {
+            CargarComboCategorias();
+
+            if (!string.IsNullOrWhiteSpace(CategoriaArbolSeleccionada))
+            {
+                DotCategorias = graphvizService.GenerarDotCategoriasDesde(CategoriaArbolSeleccionada);
+            }
+            else
+            {
+                DotCategorias = graphvizService.GenerarDotCategorias();
+            }
+
             return Page();
         }
 
@@ -70,6 +99,14 @@ namespace GestiónDeBiblioteca.Pages
         }
 
         /// <summary>
+        /// API: retorna DOT del árbol AVL alfabético (Título).
+        /// </summary>
+        public IActionResult OnGetDotArbolTitulo()
+        {
+            return Content(graphvizService.GenerarDotArbolTitulo(), "text/plain");
+        }
+
+        /// <summary>
         /// API: retorna DOT de categorías.
         /// </summary>
         public IActionResult OnGetDotCategorias()
@@ -78,7 +115,7 @@ namespace GestiónDeBiblioteca.Pages
         }
 
         /// <summary>
-        /// API: retorna DOT de libros de una categoría.
+        /// API: retorna DOT de libros de una categoría (ascendente por ISBN).
         /// </summary>
         public IActionResult OnGetDotLibros(string ruta)
         {
@@ -117,6 +154,19 @@ namespace GestiónDeBiblioteca.Pages
             }
 
             OpcionesCategorias = new SelectList(opciones, "Value", "Text");
+
+            SelectListItem[] todas = new SelectListItem[todasLasCategorias.Length];
+
+            for (int i = 0; i < todasLasCategorias.Length; i++)
+            {
+                todas[i] = new SelectListItem
+                {
+                    Value = todasLasCategorias[i].ObtenerRutaCompleta(),
+                    Text = todasLasCategorias[i].ObtenerRutaCompleta()
+                };
+            }
+
+            OpcionesTodasCategorias = new SelectList(todas, "Value", "Text");
         }
     }
 }

@@ -52,9 +52,10 @@ namespace GestiónDeBiblioteca.TDA
         /// La ruta del padre se indica con nombres separados por '>' (ej: "Ciencia > Física").
         /// El padre se resuelve por ruta y, si falla, por nombre global (nombres únicos).
         /// Si el nombre hija ya existe en cualquier nivel, retorna la existente (unicidad global).
-        /// Si el padre no existe, se crean las categorías intermedias.
+        /// Si el padre no existe, retorna null (NO crea padres fantasmas: el XML
+        /// debe declarar al padre, en cualquier orden, para linking diferido).
         /// </summary>
-        public Categoria AgregarSubcategoria(string rutaPadre, string nombreHija)
+        public Categoria? AgregarSubcategoria(string rutaPadre, string nombreHija)
         {
             Categoria? globalHija = BuscarPorNombreGlobal(nombreHija);
 
@@ -72,7 +73,7 @@ namespace GestiónDeBiblioteca.TDA
 
             if (padre == null)
             {
-                padre = BuscarOCrearPorRuta(rutaPadre);
+                return null;
             }
 
             Categoria? existente = padre.Hijos.BuscarPorNombre(nombreHija);

@@ -145,11 +145,19 @@
 
     @* ========== ÁRBOL DE CATEGORÍAS EN GRAPHVIZ ========== *@
     <div class="card shadow-sm mb-4">
-        <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
+        <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center flex-wrap gap-2">
             <h4 class="mb-0">Diagrama Visual de Categorías (Graphviz)</h4>
-            <button class="btn btn-sm btn-outline-light" onclick="cargarGraficoCategorias()">
-                Regenerar
-            </button>
+            <div>
+                <button class="btn btn-sm btn-light me-2" id="btnCatSVG" onclick="descargarCatSVG()" disabled>
+                    Descargar SVG
+                </button>
+                <button class="btn btn-sm btn-light me-2" id="btnCatPNG" onclick="descargarCatPNG()" disabled>
+                    Descargar PNG
+                </button>
+                <button class="btn btn-sm btn-outline-light" onclick="cargarGraficoCategorias()">
+                    Regenerar
+                </button>
+            </div>
         </div>
         <div class="card-body text-center">
             <div id="graficoCategorias" style="min-height: 200px;">
@@ -162,31 +170,125 @@
 
 @section Scripts {
 <script>
+    function mostrarDotComoTexto(container, dot, motivo) {
+        var safe = dot.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        container.innerHTML =
+            '<div class="alert alert-warning">' + motivo + '</div>' +
+            '<div class="mb-2">' +
+            '<button class="btn btn-sm btn-outline-secondary me-2" onclick="copiarDot(this)">Copiar DOT</button>' +
+            '<button class="btn btn-sm btn-outline-secondary me-2" onclick="descargarDot(this)">Descargar .dot</button>' +
+            '<a class="btn btn-sm btn-outline-primary" target="_blank" rel="noopener" href="https://dreampuf.github.io/GraphvizOnline/">Abrir en GraphvizOnline</a>' +
+            '</div>' +
+            '<pre class="bg-light p-3 rounded text-start" style="overflow-x:auto; white-space:pre-wrap; font-size:12px;" data-dot></pre>';
+        container.querySelector('[data-dot]').textContent = dot;
+    }
+
+    function copiarDot(btn) {
+        var pre = btn.closest('div').parentElement.querySelector('[data-dot]');
+        navigator.clipboard.writeText(pre.textContent).then(function () { btn.textContent = 'Copiado'; });
+    }
+
+    function descargarDot(btn) {
+        var pre = btn.closest('div').parentElement.querySelector('[data-dot]');
+        var blob = new Blob([pre.textContent], { type: 'text/vnd.graphviz' });
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'diagrama.dot';
+        a.click();
+    }
+
+    var svgCategorias = null;
+
+    function actualizarBotonesCat() {
+        var hay = !!svgCategorias;
+        document.getElementById('btnCatSVG').disabled = !hay;
+        document.getElementById('btnCatPNG').disabled = !hay;
+    }
+
+    function descargarCatSVG() {
+        if (!svgCategorias) {
+            return;
+        }
+        var xml = new XMLSerializer().serializeToString(svgCategorias);
+        var blob = new Blob([xml], { type: 'image/svg+xml;charset=utf-8' });
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'categorias.svg';
+        a.click();
+        setTimeout(function() { URL.revokeObjectURL(a.href); }, 5000);
+    }
+
+    function descargarCatPNG() {
+        if (!svgCategorias) {
+            return;
+        }
+        var xml = new XMLSerializer().serializeToString(svgCategorias);
+        var url = URL.createObjectURL(new Blob([xml], { type: 'image/svg+xml;charset=utf-8' }));
+        var img = new Image();
+        img.onload = function() {
+            try {
+                var escala = 2;
+                var w = svgCategorias.clientWidth || img.width || 800;
+                var h = svgCategorias.clientHeight || img.height || 600;
+                var canvas = document.createElement('canvas');
+                canvas.width = Math.round(w * escala);
+                canvas.height = Math.round(h * escala);
+                var ctx = canvas.getContext('2d');
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                URL.revokeObjectURL(url);
+                canvas.toBlob(function(blob) {
+                    if (!blob) {
+                        return;
+                    }
+                    var a = document.createElement('a');
+                    a.href = URL.createObjectURL(blob);
+                    a.download = 'categorias.png';
+                    a.click();
+                    setTimeout(function() { URL.revokeObjectURL(a.href); }, 5000);
+                }, 'image/png');
+            } catch (e) {
+                URL.revokeObjectURL(url);
+            }
+        };
+        img.onerror = function() { URL.revokeObjectURL(url); };
+        img.src = url;
+    }
+
     function cargarGraficoCategorias() {
+        var container = document.getElementById('graficoCategorias');
+        svgCategorias = null;
+        actualizarBotonesCat();
         fetch('/Catalogo?handler=DotCategorias')
-            .then(r => r.text())
-            .then(dot => {
+            .then(function (r) { return r.text(); })
+            .then(function (dot) {
+                if (typeof Viz === 'undefined') {
+                    mostrarDotComoTexto(container, dot, 'No se pudo cargar el motor de diagramas local (viz.js). Se muestra el código DOT; puede copiarlo o abrirlo en GraphvizOnline.');
+                    return;
+                }
                 try {
                     var viz = new Viz();
                     viz.renderSVGElement(dot)
-                        .then(svg => {
-                            var container = document.getElementById('graficoCategorias');
+                        .then(function (svg) {
                             container.innerHTML = '';
                             svg.style.maxWidth = '100%';
                             svg.style.height = 'auto';
                             container.appendChild(svg);
+                            svgCategorias = svg;
+                            actualizarBotonesCat();
                         })
-                        .catch(err => {
-                            document.getElementById('graficoCategorias').innerHTML =
-                                '<div class="alert alert-danger">Error renderizando: ' + err.message + '</div>';
+                        .catch(function (err) {
+                            var detalle = (err && err.message) ? err.message : String(err);
+                            mostrarDotComoTexto(container, dot, 'Error renderizando el diagrama: ' + detalle);
                         });
                 } catch (e) {
-                    document.getElementById('graficoCategorias').innerHTML =
-                        '<div class="alert alert-warning">viz.js no disponible. Verifique la conexión a internet.</div>';
+                    var detalle2 = (e && e.message) ? e.message : String(e);
+                    mostrarDotComoTexto(container, dot, 'Error iniciando viz.js: ' + detalle2);
                 }
             })
-            .catch(err => {
-                document.getElementById('graficoCategorias').innerHTML =
+            .catch(function (err) {
+                container.innerHTML =
                     '<div class="alert alert-danger">Error cargando DOT: ' + err + '</div>';
             });
     }

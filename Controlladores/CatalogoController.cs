@@ -31,9 +31,10 @@ namespace GestiónDeBiblioteca.Controlladores
 
         /// <summary>
         /// Registra un nuevo libro en todos los índices.
-        /// Retorna false si el ISBN ya existe.
+        /// Retorna false si el ISBN ya existe o si la categoría no existe.
         /// La categoría se resuelve por ruta y, si falla, por nombre global
         /// (los libros XML referencian solo el nombre hoja).
+        /// NO crea categorías automáticamente: el XML debe declararlas antes.
         /// </summary>
         public bool RegistrarLibro(Libro libro)
         {
@@ -43,24 +44,23 @@ namespace GestiónDeBiblioteca.Controlladores
                 return false;
             }
 
+            // Resolver categoría (ruta completa o nombre hoja global)
+            Categoria? categoria = arbolCategorias.BuscarPorRuta(libro.Categoria);
+
+            if (categoria == null)
+            {
+                categoria = arbolCategorias.BuscarPorNombreGlobal(libro.Categoria.Trim());
+            }
+
+            if (categoria == null)
+            {
+                return false;
+            }
+
             // Insertar en los tres índices
             arbolISBN.Insertar(libro);
             arbolTitulo.Insertar(libro);
-
-            // Insertar en la categoría correspondiente del árbol n-ario
-            Categoria? categoria = arbolCategorias.BuscarPorRuta(libro.Categoria);
-
-            if (categoria != null)
-            {
-                categoria.Libros.Insertar(libro);
-            }
-            else
-            {
-                // Si la categoría no existe, crearla como categoría raíz
-                // (BuscarPorRuta ya intentó resolución global para nombres simples)
-                Categoria nuevaCat = arbolCategorias.AgregarCategoria(libro.Categoria);
-                nuevaCat.Libros.Insertar(libro);
-            }
+            categoria.Libros.Insertar(libro);
 
             return true;
         }
@@ -170,9 +170,9 @@ namespace GestiónDeBiblioteca.Controlladores
 
         /// <summary>
         /// Agrega una subcategoría bajo una ruta de padre.
-        /// Crea las categorías intermedias si no existen.
+        /// Retorna null si el padre no existe (no crea fantasmas).
         /// </summary>
-        public Categoria AgregarSubcategoria(string rutaPadre, string nombreHija)
+        public Categoria? AgregarSubcategoria(string rutaPadre, string nombreHija)
         {
             return arbolCategorias.AgregarSubcategoria(rutaPadre, nombreHija);
         }
@@ -218,21 +218,6 @@ namespace GestiónDeBiblioteca.Controlladores
             arbolISBN = new ArbolLibrosISBN();
             arbolTitulo = new ArbolLibrosTitulo();
             arbolCategorias = new ArbolCategorias();
-        }
-
-        /// <summary>
-        /// Retorna los libros que pertenecen a una categoría específica.
-        /// </summary>
-        public Libro[] ObtenerLibrosPorCategoria(string rutaCategoria)
-        {
-            Categoria? categoria = arbolCategorias.BuscarPorRuta(rutaCategoria);
-
-            if (categoria == null)
-            {
-                return new Libro[0];
-            }
-
-            return categoria.Libros.ObtenerAscendente();
         }
 
         /// <summary>

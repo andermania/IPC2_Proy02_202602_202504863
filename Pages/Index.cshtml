@@ -19,6 +19,35 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     }
+    @if (!string.IsNullOrEmpty(Model.MensajeError))
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @Model.MensajeError
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    @if (Model.ResultadosCarga.Length > 0)
+    {
+        <div class="alert alert-success text-start" role="alert">
+            <ul class="mb-0">
+                @foreach (var r in Model.ResultadosCarga)
+                {
+                    <li>@r</li>
+                }
+            </ul>
+        </div>
+    }
+    @if (Model.ErroresCarga.Length > 0)
+    {
+        <div class="alert alert-danger text-start" role="alert">
+            <ul class="mb-0">
+                @foreach (var e in Model.ErroresCarga)
+                {
+                    <li>@e</li>
+                }
+            </ul>
+        </div>
+    }
     <div class="contenedor-tarjetas">
         <div class="boton-tarjeta boton-catalogo" onclick="window.location.href='/Catalogo'">
             <span>CATÁLOGO</span>
@@ -26,19 +55,20 @@
         <div class="boton-tarjeta boton-gestion" onclick="window.location.href='/Gestion'">
             <span>GESTIÓN</span>
         </div>
-        <div class="boton-tarjeta boton-carga" onclick="window.location.href='/CargarLibros'">
-            <span>CARGAR LIBROS</span>
-        </div>
         <div class="boton-tarjeta boton-reportes" onclick="window.location.href='/Reportes'">
             <span>REPORTES</span>
         </div>
     </div>
-    <div class="mt-4">
+    <div class="mt-4 d-flex justify-content-center gap-3 flex-wrap">
+        <form method="post" asp-page-handler="CargarCarpeta">
+            <button type="submit" class="btn btn-primary">
+                Cargar Libros (carpeta XML/)
+            </button>
+        </form>
         <form method="post" asp-page-handler="Reiniciar" onsubmit="return confirm('¿Inicializar el sistema? Se borrarán todos los datos en memoria.');">
             <button type="submit" class="btn btn-success">
                 Inicializar sistema (vaciar catálogo)
             </button>
-            <input type="text"/>
         </form>
     </div>
 </div>

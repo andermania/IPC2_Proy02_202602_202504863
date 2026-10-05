@@ -103,12 +103,18 @@
                 <div class="card-body">
                     <form method="post" asp-page-handler="Buscar">
                         <div class="mb-3">
-                            <label class="form-label fw-bold">ISBN</label>
+                            <label class="form-label fw-bold">ISBN (árbol AVL por ISBN)</label>
                             <input asp-for="BusquedaISBN"
                                    type="number"
                                    class="form-control"
-                                   placeholder="Ingrese el ISBN a buscar"
-                                   required />
+                                   placeholder="Ingrese el ISBN a buscar" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Título (árbol AVL alfabético)</label>
+                            <input asp-for="BusquedaTitulo"
+                                   type="text"
+                                   class="form-control"
+                                   placeholder="Ingrese el título a buscar" />
                         </div>
                         <button type="submit"
                                 class="btn btn-primary w-100">
@@ -119,7 +125,12 @@
                     @if (Model.LibroEncontrado != null)
                     {
                         <hr />
-                        <div class="card bg-light">
+                        <div class="card bg-light position-relative">
+                            <form method="post" asp-page-handler="EliminarIndividual" asp-route-isbn="@Model.LibroEncontrado.ISBN" onsubmit="return confirm('¿Eliminar el libro con ISBN @Model.LibroEncontrado.ISBN de todo el catálogo?');">
+                                <button type="submit" class="btn btn-sm btn-outline-danger position-absolute top-0 end-0 m-2" title="Eliminar libro">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/><path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/></svg>
+                                </button>
+                            </form>
                             <div class="card-body">
                                 <h5 class="card-title">@Model.LibroEncontrado.Titulo</h5>
                                 <p class="mb-1"><strong>ISBN:</strong> @Model.LibroEncontrado.ISBN</p>
@@ -133,6 +144,31 @@
                     {
                         <div class="alert alert-info mt-3 mb-0">
                             @Model.MensajeBusqueda
+                        </div>
+                    }
+
+                    @if (Model.LibroEncontradoTitulo != null)
+                    {
+                        <hr />
+                        <div class="card bg-light position-relative">
+                            <form method="post" asp-page-handler="EliminarIndividual" asp-route-isbn="@Model.LibroEncontradoTitulo.ISBN" onsubmit="return confirm('¿Eliminar el libro con ISBN @Model.LibroEncontradoTitulo.ISBN de todo el catálogo?');">
+                                <button type="submit" class="btn btn-sm btn-outline-danger position-absolute top-0 end-0 m-2" title="Eliminar libro">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/><path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/></svg>
+                                </button>
+                            </form>
+                            <div class="card-body">
+                                <h5 class="card-title">@Model.LibroEncontradoTitulo.Titulo</h5>
+                                <p class="mb-1"><strong>ISBN:</strong> @Model.LibroEncontradoTitulo.ISBN</p>
+                                <p class="mb-1"><strong>Autor:</strong> @Model.LibroEncontradoTitulo.Autor</p>
+                                <p class="mb-0"><strong>Categoría:</strong> @Model.LibroEncontradoTitulo.Categoria</p>
+                            </div>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(Model.MensajeBusquedaTitulo))
+                    {
+                        <div class="alert alert-info mt-3 mb-0">
+                            @Model.MensajeBusquedaTitulo
                         </div>
                     }
                 </div>
@@ -271,6 +307,45 @@
 
 @section Scripts {
 <script>
+
+    // ========== Combo dependiente Categoría -> Subcategoría ==========
+    const selectCategoria = document.getElementById("selectCategoria");
+    const selectSubcategoria = document.getElementById("selectSubcategoria");
+
+    async function cargarSubcategorias(nombreCategoria, preservar) {
+        selectSubcategoria.innerHTML = '<option value="">-- Sin subcategoría --</option>';
+
+        if (!nombreCategoria) {
+            return;
+        }
+
+        try {
+            const resp = await fetch('/Gestion?handler=Subcategorias&categoria=' + encodeURIComponent(nombreCategoria));
+            const datos = await resp.json();
+
+            datos.forEach(function (item) {
+                const opt = document.createElement("option");
+                opt.value = item.value;
+                opt.textContent = item.text;
+                if (preservar && item.value === preservar) {
+                    opt.selected = true;
+                }
+                selectSubcategoria.appendChild(opt);
+            });
+        } catch (e) {
+            console.error("Error cargando subcategorías:", e);
+        }
+    }
+
+    selectCategoria.addEventListener("change", function () {
+        cargarSubcategorias(selectCategoria.value, null);
+    });
+
+    // Al recargar tras un POST, repoblar subcategorías de la categoría retenida
+    const subSeleccionada = "@Model.SubcategoriaSeleccionada";
+    if (selectCategoria.value) {
+        cargarSubcategorias(selectCategoria.value, subSeleccionada);
+    }
 
     // Select All checkbox
     const checkAll = document.getElementById("checkAll");

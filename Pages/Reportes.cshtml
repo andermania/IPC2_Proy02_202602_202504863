@@ -15,7 +15,7 @@
     @* ========== SELECCIONAR TIPO DE REPORTE ========== *@
     <div class="row mb-4">
 
-        <div class="col-md-4 mb-3">
+        <div class="col-md-6 mb-3">
             <div class="card shadow-sm h-100 border-primary">
                 <div class="card-body text-center">
                     <h5 class="card-title text-primary">Árbol AVL por ISBN</h5>
@@ -32,7 +32,24 @@
             </div>
         </div>
 
-        <div class="col-md-4 mb-3">
+        <div class="col-md-6 mb-3">
+            <div class="card shadow-sm h-100 border-info">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-info">Árbol AVL por Título</h5>
+                    <p class="card-text text-muted">
+                        Árbol AVL alfabético con rotaciones, igual que el de ISBN.
+                    </p>
+                    <form method="post" asp-page-handler="ArbolTitulo">
+                        <button type="submit"
+                                class="btn btn-info text-white w-100">
+                            Generar Diagrama
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-3">
             <div class="card shadow-sm h-100 border-success">
                 <div class="card-body text-center">
                     <h5 class="card-title text-success">Estructura de Categorías</h5>
@@ -49,13 +66,17 @@
             </div>
         </div>
 
-        <div class="col-md-4 mb-3">
+        <div class="col-md-6 mb-3">
             <div class="card shadow-sm h-100 border-warning">
                 <div class="card-body text-center">
                     <h5 class="card-title text-warning">Libros por Categoría</h5>
                     <p class="card-text text-muted">
                         Libros ordenados por ISBN de una categoría.
                     </p>
+                    <a href="#formLibrosCategoria"
+                       class="btn btn-warning w-100">
+                        Generar Diagrama
+                    </a>
                 </div>
             </div>
         </div>
@@ -63,12 +84,12 @@
     </div>
 
     @* ========== LIBROS POR CATEGORÍA ========== *@
-    <div class="card shadow-sm mb-4">
+    <div class="card shadow-sm mb-4" id="formLibrosCategoria">
         <div class="card-header bg-warning text-dark">
             <h4 class="mb-0">Libros de una Categoría (Graphviz)</h4>
         </div>
         <div class="card-body">
-            <form method="post" asp-page-handler="LibrosCategoria" class="row g-3 mb-4">
+            <form method="post" asp-page-handler="LibrosCategoria" class="row g-3 mb-0">
                 <div class="col-md-8">
                     <select asp-for="CategoriaSeleccionada"
                             asp-items="Model.OpcionesCategorias"
@@ -87,10 +108,42 @@
         </div>
     </div>
 
+    @* ========== ESTRUCTURA DESDE SUBCATEGORÍA ========== *@
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-success text-white">
+            <h4 class="mb-0">Estructura desde Subcategoría (Graphviz)</h4>
+        </div>
+        <div class="card-body">
+            <form method="post" asp-page-handler="EstructuraDesde" class="row g-3 mb-0">
+                <div class="col-md-8">
+                    <select asp-for="CategoriaArbolSeleccionada"
+                            asp-items="Model.OpcionesTodasCategorias"
+                            class="form-select">
+                        <option value="">-- Raíz completa --</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <button type="submit"
+                            class="btn btn-success w-100">
+                        Generar Diagrama
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     @* ========== DIAGRAMA ACTUAL ========== *@
     <div class="card shadow-sm mb-4">
-        <div class="card-header bg-secondary text-white">
+        <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center flex-wrap gap-2">
             <h4 class="mb-0">Diagrama Generado</h4>
+            <div>
+                <button id="btnDescargarSVG" class="btn btn-sm btn-light me-2" onclick="descargarSVG()" disabled>
+                    Descargar SVG
+                </button>
+                <button id="btnDescargarPNG" class="btn btn-sm btn-light" onclick="descargarPNG()" disabled>
+                    Descargar PNG
+                </button>
+            </div>
         </div>
         <div class="card-body text-center">
             <div id="graficoGraphviz" style="min-height: 200px;">
@@ -104,13 +157,21 @@
 @section Scripts {
 <script>
     // DOT data from server-side rendering
-    var dotData = @if (Model.DotCategorias != null)
+    var dotData = @if (Model.DotArbolISBN != null)
     {
-        <text>"@Html.Raw(Model.DotCategorias.Replace("\\", "\\\\").Replace("\"", "\\\"").Replace("\n", "\\n").Replace("\r", ""))"</text>
+        <text>"@Html.Raw(Model.DotArbolISBN.Replace("\\", "\\\\").Replace("\"", "\\\"").Replace("\n", "\\n").Replace("\r", ""))"</text>
+    }
+    else if (Model.DotArbolTitulo != null)
+    {
+        <text>"@Html.Raw(Model.DotArbolTitulo.Replace("\\", "\\\\").Replace("\"", "\\\"").Replace("\n", "\\n").Replace("\r", ""))"</text>
     }
     else if (Model.DotLibrosCategoria != null)
     {
         <text>"@Html.Raw(Model.DotLibrosCategoria.Replace("\\", "\\\\").Replace("\"", "\\\"").Replace("\n", "\\n").Replace("\r", ""))"</text>
+    }
+    else if (Model.DotCategorias != null)
+    {
+        <text>"@Html.Raw(Model.DotCategorias.Replace("\\", "\\\\").Replace("\"", "\\\"").Replace("\n", "\\n").Replace("\r", ""))"</text>
     }
     else
     {
@@ -118,11 +179,129 @@
     }
     ;
 
+    // Nombre del diagrama actual (para el nombre del archivo descargado)
+    var nombreDiagrama = @if (Model.DotArbolISBN != null)
+    {
+        <text>"arbol-avl-isbn"</text>
+    }
+    else if (Model.DotArbolTitulo != null)
+    {
+        <text>"arbol-avl-titulo"</text>
+    }
+    else if (Model.DotLibrosCategoria != null)
+    {
+        <text>"libros-categoria"</text>
+    }
+    else if (Model.DotCategorias != null)
+    {
+        <text>"categorias"</text>
+    }
+    else
+    {
+        <text>"diagrama"</text>
+    }
+    ;
+
+    // Referencia al SVG renderizado (null si se muestra texto/DOT)
+    var svgActual = null;
+
+    function actualizarBotonesDescarga() {
+        var haySvg = !!svgActual;
+        document.getElementById('btnDescargarSVG').disabled = !haySvg;
+        document.getElementById('btnDescargarPNG').disabled = !haySvg;
+    }
+
+    function descargarSVG() {
+        if (!svgActual) {
+            return;
+        }
+        var xml = new XMLSerializer().serializeToString(svgActual);
+        var blob = new Blob([xml], { type: 'image/svg+xml;charset=utf-8' });
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = nombreDiagrama + '.svg';
+        a.click();
+        setTimeout(function() { URL.revokeObjectURL(a.href); }, 5000);
+    }
+
+    function descargarPNG() {
+        if (!svgActual) {
+            return;
+        }
+        var xml = new XMLSerializer().serializeToString(svgActual);
+        var svgBlob = new Blob([xml], { type: 'image/svg+xml;charset=utf-8' });
+        var url = URL.createObjectURL(svgBlob);
+        var img = new Image();
+        img.onload = function() {
+            try {
+                var escala = 2; // x2 para buena resolución
+                var w = svgActual.clientWidth || img.width || 800;
+                var h = svgActual.clientHeight || img.height || 600;
+                var canvas = document.createElement('canvas');
+                canvas.width = Math.round(w * escala);
+                canvas.height = Math.round(h * escala);
+                var ctx = canvas.getContext('2d');
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                URL.revokeObjectURL(url);
+                canvas.toBlob(function(blob) {
+                    if (!blob) {
+                        return;
+                    }
+                    var a = document.createElement('a');
+                    a.href = URL.createObjectURL(blob);
+                    a.download = nombreDiagrama + '.png';
+                    a.click();
+                    setTimeout(function() { URL.revokeObjectURL(a.href); }, 5000);
+                }, 'image/png');
+            } catch (e) {
+                URL.revokeObjectURL(url);
+            }
+        };
+        img.onerror = function() { URL.revokeObjectURL(url); };
+        img.src = url;
+    }
+
+    function mostrarDotComoTexto(dot, motivo) {
+        var container = document.getElementById('graficoGraphviz');
+        container.innerHTML =
+            '<div class="alert alert-warning">' + motivo + '</div>' +
+            '<div class="mb-2">' +
+            '<button class="btn btn-sm btn-outline-secondary me-2" onclick="copiarDotReporte(this)">Copiar DOT</button>' +
+            '<button class="btn btn-sm btn-outline-secondary me-2" onclick="descargarDotReporte(this)">Descargar .dot</button>' +
+            '<a class="btn btn-sm btn-outline-primary" target="_blank" rel="noopener" href="https://dreampuf.github.io/GraphvizOnline/">Abrir en GraphvizOnline</a>' +
+            '</div>' +
+            '<pre class="bg-light p-3 rounded text-start" style="overflow-x:auto; white-space:pre-wrap; font-size:12px;" data-dot></pre>';
+        container.querySelector('[data-dot]').textContent = dot;
+    }
+
+    function copiarDotReporte(btn) {
+        var pre = btn.closest('div').parentElement.querySelector('[data-dot]');
+        navigator.clipboard.writeText(pre.textContent).then(function () { btn.textContent = 'Copiado'; });
+    }
+
+    function descargarDotReporte(btn) {
+        var pre = btn.closest('div').parentElement.querySelector('[data-dot]');
+        var blob = new Blob([pre.textContent], { type: 'text/vnd.graphviz' });
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'diagrama.dot';
+        a.click();
+    }
+
     function renderizarDot(dot) {
         var container = document.getElementById('graficoGraphviz');
+        svgActual = null;
+        actualizarBotonesDescarga();
 
         if (!dot || dot.trim() === '') {
             container.innerHTML = '<p class="text-muted">No hay datos para mostrar.</p>';
+            return;
+        }
+
+        if (typeof Viz === 'undefined') {
+            mostrarDotComoTexto(dot, 'No se pudo cargar el motor de diagramas local (viz.js). Se muestra el código DOT; puede copiarlo o abrirlo en GraphvizOnline.');
             return;
         }
 
@@ -134,12 +313,16 @@
                     svg.style.maxWidth = '100%';
                     svg.style.height = 'auto';
                     container.appendChild(svg);
+                    svgActual = svg;
+                    actualizarBotonesDescarga();
                 })
                 .catch(function(err) {
-                    container.innerHTML = '<div class="alert alert-danger">Error renderizando: ' + err.message + '</div>';
+                    var detalle = (err && err.message) ? err.message : String(err);
+                    mostrarDotComoTexto(dot, 'Error renderizando el diagrama: ' + detalle);
                 });
         } catch (e) {
-            container.innerHTML = '<div class="alert alert-warning">viz.js no disponible. Verifique la conexión a internet.</div>';
+            var detalle2 = (e && e.message) ? e.message : String(e);
+            mostrarDotComoTexto(dot, 'Error iniciando viz.js: ' + detalle2);
         }
     }
 

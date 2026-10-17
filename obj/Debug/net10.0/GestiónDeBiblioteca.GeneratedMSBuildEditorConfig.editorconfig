@@ -12,57 +12,57 @@ build_property.EntryPointFilePath =
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = GestiónDeBiblioteca
 build_property.RootNamespace = GestiónDeBiblioteca
-build_property.ProjectDir = C:\Users\kevin\source\repos\GestiónDeBiblioteca\GestiónDeBiblioteca\
+build_property.ProjectDir = C:\Users\kevin\source\repos\GestiónDeBiblioteca2\GestiónDeBiblioteca\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
 build_property.RazorLangVersion = 10.0
 build_property.SupportLocalizedComponentNames = 
 build_property.GenerateRazorMetadataSourceChecksumAttributes = 
-build_property.MSBuildProjectDirectory = C:\Users\kevin\source\repos\GestiónDeBiblioteca\GestiónDeBiblioteca
+build_property.MSBuildProjectDirectory = C:\Users\kevin\source\repos\GestiónDeBiblioteca2\GestiónDeBiblioteca
 build_property._RazorSourceGeneratorDebug = 
 build_property.EffectiveAnalysisLevelStyle = 10.0
 build_property.EnableCodeStyleSeverity = 
 
-[C:/Users/kevin/source/repos/GestiónDeBiblioteca/GestiónDeBiblioteca/Pages/Ayuda.cshtml]
+[C:/Users/kevin/source/repos/GestiónDeBiblioteca2/GestiónDeBiblioteca/Pages/Ayuda.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQXl1ZGEuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/kevin/source/repos/GestiónDeBiblioteca/GestiónDeBiblioteca/Pages/Catalogo.cshtml]
+[C:/Users/kevin/source/repos/GestiónDeBiblioteca2/GestiónDeBiblioteca/Pages/Catalogo.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ2F0YWxvZ28uY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/kevin/source/repos/GestiónDeBiblioteca/GestiónDeBiblioteca/Pages/Error.cshtml]
+[C:/Users/kevin/source/repos/GestiónDeBiblioteca2/GestiónDeBiblioteca/Pages/Error.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRXJyb3IuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/kevin/source/repos/GestiónDeBiblioteca/GestiónDeBiblioteca/Pages/Gestion.cshtml]
+[C:/Users/kevin/source/repos/GestiónDeBiblioteca2/GestiónDeBiblioteca/Pages/Gestion.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcR2VzdGlvbi5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/kevin/source/repos/GestiónDeBiblioteca/GestiónDeBiblioteca/Pages/Index.cshtml]
+[C:/Users/kevin/source/repos/GestiónDeBiblioteca2/GestiónDeBiblioteca/Pages/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/kevin/source/repos/GestiónDeBiblioteca/GestiónDeBiblioteca/Pages/Privacy.cshtml]
+[C:/Users/kevin/source/repos/GestiónDeBiblioteca2/GestiónDeBiblioteca/Pages/Privacy.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJpdmFjeS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/kevin/source/repos/GestiónDeBiblioteca/GestiónDeBiblioteca/Pages/Reportes.cshtml]
+[C:/Users/kevin/source/repos/GestiónDeBiblioteca2/GestiónDeBiblioteca/Pages/Reportes.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmVwb3J0ZXMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/kevin/source/repos/GestiónDeBiblioteca/GestiónDeBiblioteca/Pages/Shared/_ValidationScriptsPartial.cshtml]
+[C:/Users/kevin/source/repos/GestiónDeBiblioteca2/GestiónDeBiblioteca/Pages/Shared/_ValidationScriptsPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2hhcmVkXF9WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/kevin/source/repos/GestiónDeBiblioteca/GestiónDeBiblioteca/Pages/_ViewImports.cshtml]
+[C:/Users/kevin/source/repos/GestiónDeBiblioteca2/GestiónDeBiblioteca/Pages/_ViewImports.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcX1ZpZXdJbXBvcnRzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/kevin/source/repos/GestiónDeBiblioteca/GestiónDeBiblioteca/Pages/_ViewStart.cshtml]
+[C:/Users/kevin/source/repos/GestiónDeBiblioteca2/GestiónDeBiblioteca/Pages/_ViewStart.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcX1ZpZXdTdGFydC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/kevin/source/repos/GestiónDeBiblioteca/GestiónDeBiblioteca/Pages/Shared/_Layout.cshtml]
+[C:/Users/kevin/source/repos/GestiónDeBiblioteca2/GestiónDeBiblioteca/Pages/Shared/_Layout.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2hhcmVkXF9MYXlvdXQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = b-610s6mqekl

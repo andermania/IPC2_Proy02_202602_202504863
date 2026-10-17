@@ -143,6 +143,40 @@
         </div>
     </div>
 
+    @* ========== MOVER LIBROS ENTRE CATEGORÍAS ========== *@
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-warning text-dark">
+            <h4 class="mb-0">Mover libros entre categorías</h4>
+        </div>
+        <div class="card-body">
+            <form method="post" asp-page-handler="MoverLibros" class="row g-3">
+                <div class="col-md-5">
+                    <label class="form-label fw-bold">Categoría de origen</label>
+                    <select asp-for="CategoriaOrigen"
+                            asp-items="Model.OpcionesTodasCategorias"
+                            class="form-select"
+                            required>
+                        <option value="">Seleccionar categoria</option>
+                    </select>
+                </div>
+                <div class="col-md-5">
+                    <label class="form-label fw-bold">Categoría de destino</label>
+                    <select asp-for="CategoriaDestino"
+                            asp-items="Model.OpcionesTodasCategorias"
+                            class="form-select"
+                            required>
+                        <option value="">Seleccionar categoria</option>
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-warning text-dark w-100 fw-bold">
+                        MOVER LIBROS
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     @* ========== ÁRBOL DE CATEGORÍAS EN GRAPHVIZ ========== *@
     <div class="card shadow-sm mb-4">
         <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center flex-wrap gap-2">

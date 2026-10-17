@@ -369,6 +369,38 @@ namespace GestiónDeBiblioteca.TDA
             InOrdenInverso(actual.Izquierda, libros, ref posicion);
         }
 
+        // ===================== TRASLADO PREORDEN =====================
+
+        /// <summary>
+        /// Traslada todos los libros de este árbol al árbol destino mediante un
+        /// recorrido preorden (nodo actual, subárbol izquierdo, subárbol derecho).
+        /// Cada libro se inserta en el destino con la inserción propia del AVL,
+        /// por lo que el árbol destino conserva sus propiedades de balance.
+        /// Al finalizar, este árbol (el de origen) queda vacío.
+        /// No utiliza estructuras de C#: la recursión se apoya en los nodos del árbol.
+        /// </summary>
+        public void TrasladarPreorden(ArbolLibrosISBN destino)
+        {
+            TrasladarPreordenRecursivo(raiz, destino);
+            raiz = null;
+            contador = 0;
+        }
+
+        private void TrasladarPreordenRecursivo(NodoISBN? actual, ArbolLibrosISBN destino)
+        {
+            if (actual == null)
+            {
+                return;
+            }
+
+            // Preorden: primero se procesa el nodo actual
+            destino.Insertar(actual.Libro);
+
+            // Luego se recorren los subárboles izquierdo y derecho
+            TrasladarPreordenRecursivo(actual.Izquierda, destino);
+            TrasladarPreordenRecursivo(actual.Derecha, destino);
+        }
+
         // ===================== UTILIDADES =====================
 
         public int ObtenerCantidad()

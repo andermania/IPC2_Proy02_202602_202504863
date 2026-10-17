@@ -158,6 +158,80 @@ namespace GestiónDeBiblioteca.Controlladores
             return arbolISBN.ObtenerCantidad();
         }
 
+        // ===================== TRASLADO ENTRE CATEGORÍAS =====================
+
+        /// <summary>
+        /// Traslada todos los libros de la categoría de origen a la categoría de destino.
+        /// Se recorre el árbol AVL de libros de la categoría de origen en preorden y
+        /// cada libro se inserta en el árbol AVL de la categoría de destino con la
+        /// operación de inserción propia (que mantiene el balance del AVL destino).
+        /// Los libros conservan su ISBN, título y autor; solo cambian de categoría.
+        /// Al finalizar, la categoría de origen queda sin los libros trasladados.
+        /// Retorna null si el traslado fue correcto; si no, un mensaje de error.
+        /// </summary>
+        public string? MoverLibrosEntreCategorias(string rutaOrigen, string rutaDestino, out int totalTrasladados)
+        {
+            totalTrasladados = 0;
+
+            if (string.IsNullOrWhiteSpace(rutaOrigen) || string.IsNullOrWhiteSpace(rutaDestino))
+            {
+                return "Debe seleccionar una categoría de origen y una de destino.";
+            }
+
+            Categoria? origen = arbolCategorias.BuscarPorRuta(rutaOrigen.Trim());
+
+            if (origen == null)
+            {
+                origen = arbolCategorias.BuscarPorNombreGlobal(rutaOrigen.Trim());
+            }
+
+            Categoria? destino = arbolCategorias.BuscarPorRuta(rutaDestino.Trim());
+
+            if (destino == null)
+            {
+                destino = arbolCategorias.BuscarPorNombreGlobal(rutaDestino.Trim());
+            }
+
+            if (origen == null)
+            {
+                return $"La categoría de origen \"{rutaOrigen.Trim()}\" no existe.";
+            }
+
+            if (destino == null)
+            {
+                return $"La categoría de destino \"{rutaDestino.Trim()}\" no existe.";
+            }
+
+            if (ReferenceEquals(origen, destino))
+            {
+                return "La categoría de origen y la de destino deben ser diferentes.";
+            }
+
+            if (origen.Libros.ObtenerCantidad() == 0)
+            {
+                return "La categoría de origen no contiene libros disponibles para trasladar.";
+            }
+
+            // Capturar los libros de origen (referencias reales, sin duplicar datos).
+            Libro[] librosOrigen = origen.Libros.ObtenerAscendente();
+            totalTrasladados = librosOrigen.Length;
+
+            // Recorrido preorden del AVL de origen: cada libro se inserta en el AVL
+            // de destino usando la operación propia (mantiene el balance).
+            origen.Libros.TrasladarPreorden(destino.Libros);
+
+            // Los libros ahora pertenecen a la categoría destino: se actualiza únicamente
+            // la referencia de ubicación (no se tocan ISBN, título ni autor).
+            string rutaDestinoFinal = destino.ObtenerRutaCompleta();
+
+            for (int i = 0; i < librosOrigen.Length; i++)
+            {
+                librosOrigen[i].Categoria = rutaDestinoFinal;
+            }
+
+            return null;
+        }
+
         // ===================== GESTIÓN DE CATEGORÍAS =====================
 
         /// <summary>

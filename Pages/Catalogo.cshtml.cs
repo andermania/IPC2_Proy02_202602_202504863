@@ -28,6 +28,12 @@ namespace GestiónDeBiblioteca.Pages
         [BindProperty]
         public string RutaVisualizar { get; set; } = "";
 
+        [BindProperty]
+        public string CategoriaOrigen { get; set; } = "";
+
+        [BindProperty]
+        public string CategoriaDestino { get; set; } = "";
+
         public string EstructuraTexto { get; set; } = "";
         public string? EstructuraParcial { get; set; }
         public string? MensajeExito { get; set; }
@@ -141,6 +147,28 @@ namespace GestiónDeBiblioteca.Pages
                 EstructuraParcial = catalogo.ObtenerEstructuraDesde(RutaVisualizar);
             }
 
+            return Page();
+        }
+
+        /// <summary>
+        /// Traslada los libros de la categoría de origen a la de destino
+        /// mediante un recorrido preorden sobre el árbol AVL de la categoría origen.
+        /// </summary>
+        public IActionResult OnPostMoverLibros()
+        {
+            int totalTrasladados;
+            string? error = catalogo.MoverLibrosEntreCategorias(CategoriaOrigen, CategoriaDestino, out totalTrasladados);
+
+            if (error != null)
+            {
+                MensajeError = error;
+                CargarDatos();
+                return Page();
+            }
+
+            MensajeExito = $"Traslado realizado correctamente. Se movieron {totalTrasladados} libro(s) de " +
+                           $"\"{CategoriaOrigen.Trim()}\" a \"{CategoriaDestino.Trim()}\".";
+            CargarDatos();
             return Page();
         }
 
